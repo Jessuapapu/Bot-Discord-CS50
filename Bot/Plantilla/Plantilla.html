@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+
+        table.header {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        table.header td {
+            vertical-align: top;
+        }
+
+        .info-texto {
+            font-size: 16px;
+        }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        thead {
+            background-color: #e0e0e0;
+        }
+
+        th, td {
+            border: 0.5px solid #666;
+            padding: 6px 10px;
+            text-align: left;
+        }
+
+        th {
+            font-weight: bold;
+            color: #333;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f7f7f7;
+        }
+
+        tbody td:first-child {
+            font-weight: bold;
+        }
+
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <table class="header">
+        <tr>
+            <td style="padding-right: 10px;">
+                <img src="{{ logo }}" style="height: 60px;">
+            </td>
+            <td class="info-texto">
+                <p>{{ Fecha }}</p>
+                <p>{{ Offices }}</p>
+            </td>
+        </tr>
+    </table>
+    
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Grupo</th>
+                <th class="center">Cumplimiento (horas)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for Estudiante in Estudiantes %}
+            <tr>
+                <td>{{ Estudiante.nombre }}</td>
+                <td>{{ Estudiante.grupo }}</td>
+                <td class="center">{{ Estudiante.cumplimiento }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>

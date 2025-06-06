@@ -1,14 +1,25 @@
+# Api de discord
 import discord
+from discord.ext import commands
+# Modulos para las funciones del sistema y obtener el token de .env
 import time
 import asyncio
 import os
-
+from datetime import datetime
 from dotenv import load_dotenv
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import inch
-from discord.ext import commands
+
+# Librerias para generar los PDFs -------------------------
+#   Jinja La que genera el html a partir de una plantilla
+from jinja2 import Environment, FileSystemLoader
+#   xhtml2pdf genera el Pdf apartir del html generado con jinja (nota: NO sosporta bien el css y quedo mas o menos simple xd)
+from xhtml2pdf import pisa
+
+# Aun sin usar
+import requests
+
+# Definiciones de funciones y estructuras de datos
 from Clases import util
+
 
 # Permisos
 intents = discord.Intents.default()
@@ -30,6 +41,7 @@ ContadoresActivos = {}  # { str(user.id): (Estudiante, tarea, IdOffices) }
 
 
 # ---------- COMANDO OFFICES ----------
+# Comando Para iniciar o finalizar una Offices
 @bot.command()
 async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
     AutorRoles = [rol.name for rol in ctx.author.roles[1:]]
@@ -117,58 +129,52 @@ async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
         asyncio.create_task(Finalizar())
         return
 
+# Comando para Guardar las Offices Generadas en PDFs
 @bot.command()
-async def OfficesGuadar(ctx,ID):
-    
-    c = canvas.Canvas(f"Reporte de Estudiantes Offices N°{ID}.pdf", pagesize=letter)
-    width, height = letter
-    
-    # Buscar el contenido por ID
+async def OfficesGuadar(ctx, ID):
+    # Buscar la oficina por ID
     for Content in OfficesAGuardar:
-        if Content.Id == ID:
+        if str(Content.Id) == str(ID):
             Contents = Content
             break
     else:
-        await ctx.send("No se encontró")
+        await ctx.send("No se encontró la offices.")
         return
-    
-    # Comenzamos a escribir desde arriba (margen superior)
-    y = height - inch  # 1 pulgada de margen desde arriba
-    
-    # Título centrado
-    titulo = f"Asistencia de Office en Línea N°{ID}"
-    c.setFont("Helvetica-Bold", 14)
-    c.drawCentredString(width / 2, y, titulo)
-    
-    # Saltamos una línea
-    y -= 0.5 * inch
-    
-    # Encabezado
-    c.setFont("Helvetica-Bold", 12)
-    c.drawString(inch, y, "Estudiante")
-    c.drawString(width / 2, y, "Cumplimiento (hrs)")
-    
-    y -= 0.3 * inch
-    
-    # Cuerpo
-    c.setFont("Helvetica", 10)
-    for cont in Contents.Usuarios:
-        if y < inch:  # Saltar de página si se llega al final
-            c.showPage()
-            y = height - inch
-        c.drawString(inch, y, str(cont.IdUsuario))
-        c.drawString(width / 2, y, "{:.1f}".format(cont.TiempoTotal / 3600))
-        y -= 0.25 * inch  # Salto de línea
-    
-    # Guardar el archivo PDF
-    c.save()
-        # Mover el PDF a la carpeta de PDFs
-    rutaOrigen = f"./Reporte de Estudiantes Offices N°{ID}.pdf"
-    rutaDestino = "./Reportes/"
-    rutaCompleta = rutaDestino + os.path.basename(rutaOrigen)
-    
-    os.rename(rutaOrigen,rutaCompleta)  
-    await ctx.send("PDF generado correctamente")
+
+    # Formatear estudiantes
+    Estudiantes = [
+        util.fomratoEstudiante(user.IdUsuario, round((user.TiempoTotal/3600)))
+        for user in Contents.Usuarios
+    ]
+
+    # Configurar entorno Jinja2
+    ruta_plantillas = os.path.join(os.path.dirname(__file__), 'Plantilla')
+    env = Environment(loader=FileSystemLoader(ruta_plantillas))
+    template = env.get_template('Plantilla.html')
+
+    # Renderizar HTML
+    ahora = datetime.now()
+    html_renderizado = template.render({
+        "Estudiantes": Estudiantes,
+        "Fecha": f"Día {ahora.day} del Mes {ahora.month}",
+        "Offices": ID,
+        "logo": os.path.join(ruta_plantillas, "Logo.png").replace("\\", "/")
+    })
+
+    # Generar PDF con xhtml2pdf
+    ruta_pdf = os.path.join("./Reportes", f"reporte {ID}.pdf")
+    with open(ruta_pdf, "w+b") as resultado:
+        pisa_status = pisa.CreatePDF(html_renderizado, dest=resultado)
+
+    if pisa_status.err:
+        await ctx.send("Error al generar el PDF.")
+        return
+
+    # Enviar mensaje y PDF
+    await ctx.send("📄 Reporte generado correctamente.")
+    await ctx.send(file=discord.File(ruta_pdf))
+   
+
 
 
 @bot.event

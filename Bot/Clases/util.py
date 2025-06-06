@@ -32,6 +32,16 @@ def VerificacionRoles(Roles:list):
         return False
     return True
 
+class fomratoEstudiante:
+    def __init__(self,Nick,cumplimiento):
+        self.grupo = Nick[:7]
+        self.nombre = Nick[10:]
+        self.cumplimiento = cumplimiento
+        
+        
+
+            
+
 ArgumentosAceptados = ["begin", "empezar", "comienzo", "1", "inicio", "carlosachambear", "chambeo", "finalizar","terminar","0","finally","carlosterminachambear"]
 ArgumentosEmpezar = ArgumentosAceptados[:7]
 ArgumentosTerminar = ArgumentosAceptados[7:]
