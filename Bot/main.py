@@ -44,20 +44,24 @@ ContadoresActivos = {}  # { str(user.id): (Estudiante, tarea, IdOffices) }
 # Comando Para iniciar o finalizar una Offices
 @bot.command()
 async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
+    
     AutorRoles = [rol.name for rol in ctx.author.roles[1:]]
 
     # Validaciones
-    if Estado.lower() not in util.ArgumentosAceptados:
+    if Estado.lower() not in util.ArgumentosEmpezar and Estado.lower() not in util.ArgumentosTerminar:
         await ctx.send("Error en el Argumento de Inicialización.")
         return
     
     CanalVoz = discord.utils.get(ctx.guild.voice_channels, name=CanalDeVoz)
+    
     if not CanalVoz:
         await ctx.send("No se encontró el canal de voz.")
         return
+    
     if len(CanalVoz.members) == 0:
         await ctx.send("No hay miembros conectados.")
         return
+    
     if not util.VerificacionRoles(AutorRoles):
         await ctx.send("No tienes permisos.")
         return
@@ -70,7 +74,6 @@ async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
         if not any(rol.name in ["Staff", "Admin Discord"] for rol in miembro.roles)
         ]
 
-        
         # Crea los contadores con su respectivo usuario
         for miembro in miembros:
             tarea = asyncio.create_task(miembro.CalcularTiempo())
@@ -78,7 +81,6 @@ async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
             print(ContadoresActivos)
 
         Office = util.Offices(ID, ctx.author.id, time.time(), 0.0, miembros)
-        OfficesAGuardar.append(Office)
         CanalesDeVoz.append(CanalVoz.id)
 
         OfficesActivas[ID] = (Office)
@@ -108,6 +110,7 @@ async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
            Estudiante,tarea = ContadoresActivos[contador]
            # Se guardan las keys para borrarlos despues
            keys.append(Estudiante.IdUsuario)
+           await ctx.send(f"Finalizando Offices {ID}")
            if Estudiante.IdOffice == ID:
                await ctx.send(f"Se esta guardando {Estudiante.IdUsuario} en la offices {ID}")
                await Estudiante.DetenerContador(tarea)
@@ -129,21 +132,30 @@ async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
         asyncio.create_task(Finalizar())
         return
 
+
 # Comando para Guardar las Offices Generadas en PDFs
 @bot.command()
-async def OfficesGuadar(ctx, ID):
+async def OfficesGuardar(ctx, ID):
     # Buscar la oficina por ID
+    indiceOffices = 0
+    SeEncontro = False
+    
     for Content in OfficesAGuardar:
+        
         if str(Content.Id) == str(ID):
             Contents = Content
+            SeEncontro = True
+            
             break
-    else:
+        indiceOffices += 1
+        
+    if not SeEncontro:
         await ctx.send("No se encontró la offices.")
         return
 
     # Formatear estudiantes
     Estudiantes = [
-        util.fomratoEstudiante(user.IdUsuario, round((user.TiempoTotal/3600)))
+        util.fomratoEstudiante(user.IdUsuario, user.TiempoTotal)
         for user in Contents.Usuarios
     ]
 
@@ -162,7 +174,7 @@ async def OfficesGuadar(ctx, ID):
     })
 
     # Generar PDF con xhtml2pdf
-    ruta_pdf = os.path.join("./Reportes", f"reporte {ID}.pdf")
+    ruta_pdf = os.path.join("./Reportes", f"Reporte {ID}.pdf")
     with open(ruta_pdf, "w+b") as resultado:
         pisa_status = pisa.CreatePDF(html_renderizado, dest=resultado)
 
@@ -170,13 +182,108 @@ async def OfficesGuadar(ctx, ID):
         await ctx.send("Error al generar el PDF.")
         return
 
+    mensajeEmbebido = ""
+    # Lista de Estudiantes formateada para el mensaje embebido
+    for Estu in Estudiantes:
+        mensajeEmbebido += Estu.toString()
+        
+
     # Enviar mensaje y PDF
-    await ctx.send("📄 Reporte generado correctamente.")
-    await ctx.send(file=discord.File(ruta_pdf))
-   
+    #   Actualizacion el mesaje se cambio con una lista en un mesaje embebido
+    ListaEmbebida = discord.Embed(
+        
+        description=mensajeEmbebido,
+        color=discord.Color.blue()
+    )
+    
+    # Se manda el mensaje embebido con su correspondiente archivo y se borra la offices de offices a guardar
+    del OfficesAGuardar[indiceOffices]
+    await ctx.send(embed=ListaEmbebida,file=discord.File(ruta_pdf))
 
+@bot.command()
+async def Obtenerpdf(ctx,Argumento,NombreDeArchivo = " "):
+    ruta_Pdfs = "./Reportes"
+    ListaArchivos = os.listdir(ruta_Pdfs)
+    
+    async def Listar():
+        mensajeEmbebido = "Lista de Archivos\n"
+        try:
+            Pdf = [pdfs for pdfs in ListaArchivos]
+            #   Genera el mensaje con la lista de pdfs
+            for pdf in Pdf:
+                mensajeEmbebido += f"{pdf}\n"
+            ListaEmbebida = discord.Embed(       
+            description=mensajeEmbebido,
+            color=discord.Color.blue()
+            )
+            await ctx.send(embed = ListaEmbebida)
+            return
+        
+        except:
+            await ctx.send(f"Error al cargar los pdfs")
+            return
+        
+    async def buscar():
+        mensajeEmbebido = "Lista de Archivos\n"
+        try:
+            Pdf = [pdfs for pdfs in ListaArchivos if pdfs.startswith("Reporte " + NombreDeArchivo)]
+            if Pdf == []:
+                await ctx.send(f"No se encontro el archivo {NombreDeArchivo}")
+                return 
+            
+            for pdf in Pdf:
+                mensajeEmbebido += f"{pdf}\n"
+            ListaEmbebida = discord.Embed(       
+            description=mensajeEmbebido,
+            color=discord.Color.green()
+            )
+            await ctx.send(embed = ListaEmbebida)
+            return
+        except:
+            await ctx.send(f"Error Al buscar el pdf")
+            return    
 
+    async def obtener():
+            Pdf = [pdfs for pdfs in ListaArchivos if pdfs.startswith("Reporte " + NombreDeArchivo)]
+            
+            for pdf in Pdf:
+                if pdf == f"Reporte {NombreDeArchivo}.pdf":
+                    await ctx.send(file=discord.File(ruta_Pdfs + f"/Reporte {NombreDeArchivo}.pdf"))
+                    return
 
+            await ctx.send(f"No se encontro el Id de archivo {NombreDeArchivo}")
+            return 
+    
+    async def eliminar():
+        Pdf = [pdfs for pdfs in ListaArchivos if pdfs.startswith("Reporte " + NombreDeArchivo)]
+            
+        for pdf in Pdf:
+            if pdf == f"Reporte {NombreDeArchivo}.pdf":
+                os.remove(ruta_Pdfs + f"/Reporte {NombreDeArchivo}.pdf")
+                ListaEmbebida = discord.Embed(       
+                description=f"Archivo Eliminado ",
+                color=discord.Color.red()
+                )
+                await ctx.send(embed = ListaEmbebida)
+                return
+            
+        await ctx.send(f"No se encontro el Id de archivo {NombreDeArchivo}")
+        return 
+    
+    # Valida la entrada de argumentos       
+    if Argumento.lower() in util.ArgumentosBuscar:
+        asyncio.create_task(buscar())
+    elif Argumento.lower() in util.ArgumentosListar:
+        asyncio.create_task(Listar())
+    elif Argumento.lower() in util.ArgumentosObtener:
+        asyncio.create_task(obtener())
+    elif Argumento.lower() in util.ArgumentosEliminar:
+        asyncio.create_task(eliminar())
+    else:
+        await ctx.send("Error al obtener el Argumento")
+        return
+        
+            
 @bot.event
 async def on_voice_state_update(member, before, after):
     user_id = str(member.display_name)
@@ -202,6 +309,5 @@ async def on_voice_state_update(member, before, after):
             estudiante, _ = ContadoresActivos[user_id]
             nueva_tarea = asyncio.create_task(estudiante.CalcularTiempo())
             ContadoresActivos[user_id] = (estudiante, nueva_tarea)
-            print(f"Contador reanudado para {member.display_name}")
             
 bot.run(TOKEN)
