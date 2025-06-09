@@ -18,6 +18,7 @@ from xhtml2pdf import pisa
 import requests
 
 # Definiciones de funciones y estructuras de datos
+# Nota:  hay que separar por mejores modulos y añadirle las logicas mejor estructuradas en un archivo aparte, que no sea en util
 from Clases import util
 
 
@@ -39,53 +40,55 @@ CanalesDeVoz = []
 ContadoresActivos = {}  # { str(user.id): (Estudiante, tarea, IdOffices) }
 
 
-
 # ---------- COMANDO OFFICES ----------
 # Comando Para iniciar o finalizar una Offices
 @bot.command()
-async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
+async def Offices(ctx, Argumento: str, ID: str, CanalDeVoz = ""):
     
-    AutorRoles = [rol.name for rol in ctx.author.roles[1:]]
-
+    
     # Validaciones
-    if Estado.lower() not in util.ArgumentosEmpezar and Estado.lower() not in util.ArgumentosTerminar:
+    if Argumento.lower() not in util.ArgumentosEmpezar + util.ArgumentosTerminar + util.ArgumentosGuardar:
         await ctx.send("Error en el Argumento de Inicialización.")
         return
     
+    # Se obtiene el Canal de voz si existe si no retorna None
     CanalVoz = discord.utils.get(ctx.guild.voice_channels, name=CanalDeVoz)
     
-    if not CanalVoz:
-        await ctx.send("No se encontró el canal de voz.")
-        return
-    
-    if len(CanalVoz.members) == 0:
-        await ctx.send("No hay miembros conectados.")
-        return
-    
-    if not util.VerificacionRoles(AutorRoles):
+    # Validacion si tiene los permisos
+    if not util.VerificacionRoles(ctx):
         await ctx.send("No tienes permisos.")
         return
     
     async def Empezar():
+        
+        # Se valida si existe el Canal de voz
+        if not CanalVoz:
+            await ctx.send("No se encontró el canal de voz.")
+            return
+        
         # Empieza el proceso
         # valida si el usuario tiene un rol de admin o staff, si no es asi lo añade a la lista
         miembros = [
         util.Estudiante(str(miembro.display_name), ID) for miembro in CanalVoz.members
         if not any(rol.name in ["Staff", "Admin Discord"] for rol in miembro.roles)
         ]
+        
+        if len(miembros) == 0:
+            await ctx.send("No hay estudiantes conectados.")
+            return
 
         # Crea los contadores con su respectivo usuario
         for miembro in miembros:
             tarea = asyncio.create_task(miembro.CalcularTiempo())
             ContadoresActivos[miembro.IdUsuario] = (miembro, tarea)
-            print(ContadoresActivos)
-
+            
+        # Crea La offices, se guarda el canal de voz al monitoreo y se añade la offices creada a Offices activas
         Office = util.Offices(ID, ctx.author.id, time.time(), 0.0, miembros)
         CanalesDeVoz.append(CanalVoz.id)
-
         OfficesActivas[ID] = (Office)
 
-        await ctx.send("Oficina iniciada correctamente.")
+
+        await ctx.send(f"Offices {ID} iniciada correctamente.")
         return
     
     async def Finalizar():
@@ -93,6 +96,11 @@ async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
         # Valida si hay offices activas
         if len(OfficesActivas) == 0:
             await ctx.send("No hay offices activas")
+            return
+        
+         # Se valida si existe el Canal de voz
+        if not CanalVoz:
+            await ctx.send("No se encontró el canal de voz.")
             return
         
         keys = []
@@ -108,10 +116,12 @@ async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
         # Inteador en los contadores Activos para finalizar los contadores
         for contador in ContadoresActivos:
            Estudiante,tarea = ContadoresActivos[contador]
-           # Se guardan las keys para borrarlos despues
-           keys.append(Estudiante.IdUsuario)
            await ctx.send(f"Finalizando Offices {ID}")
+           
+           # Se va recorriendo los contadores y se desactivan los que tienen el ID de argumento
            if Estudiante.IdOffice == ID:
+               # Se guardan las keys para borrarlos despues
+               keys.append(Estudiante.IdUsuario)
                await ctx.send(f"Se esta guardando {Estudiante.IdUsuario} en la offices {ID}")
                await Estudiante.DetenerContador(tarea)
                
@@ -123,100 +133,94 @@ async def Offices(ctx, Estado: str, ID: str, CanalDeVoz: str):
         for key in keys:
             Estudiante,tarea = ContadoresActivos[key]
             ContadoresActivos.pop(Estudiante.IdUsuario)
-        
-    # Valida si Es iniciar o finalizar    
-    if Estado.lower() in util.ArgumentosEmpezar:
+            
+            
+    async def Guardar():
+        # Buscar la oficina por ID
+        indiceOffices = 0
+        SeEncontro = False
+
+        for Content in OfficesAGuardar:
+
+            if str(Content.Id) == str(ID):
+                Contents = Content
+                SeEncontro = True
+                break
+            indiceOffices += 1
+
+        if not SeEncontro:
+            await ctx.send("No se encontró la offices.")
+            return
+
+        # Formatear estudiantes - Nota: Esto es mal planteado toca refactorizar
+        Estudiantes = [
+            util.fomratoEstudiante(user.IdUsuario, user.TiempoTotal)
+            for user in Contents.Usuarios
+        ]
+
+        # Configurar entorno Jinja2
+        ruta_plantillas = os.path.join(os.path.dirname(__file__), 'Plantilla')
+        env = Environment(loader=FileSystemLoader(ruta_plantillas))
+        template = env.get_template('Plantilla.html')
+
+        # Renderizar HTML
+        ahora = datetime.now()
+        html_renderizado = template.render({
+            "Estudiantes": Estudiantes,
+            "Fecha": f"Día {ahora.day} del Mes {ahora.month}",
+            "Offices": ID,
+            "logo": os.path.join(ruta_plantillas, "Logo.png").replace("\\", "/")
+        })
+
+        # Generar PDF con xhtml2pdf
+        ruta_pdf = os.path.join("./Reportes", f"Reporte {ID}.pdf")
+        with open(ruta_pdf, "w+b") as resultado:
+            pisa_status = pisa.CreatePDF(html_renderizado, dest=resultado)
+
+        if pisa_status.err:
+            await ctx.send("Error al generar el PDF.")
+            return
+
+        mensajeEmbebido = ""
+        # Lista de Estudiantes formateada para el mensaje embebido
+        for Estu in Estudiantes:
+            mensajeEmbebido += Estu.toString()
+
+        # Se manda el mensaje embebido con su correspondiente archivo y se borra la offices de offices a guardar
+        del OfficesAGuardar[indiceOffices]
+        await ctx.send(embed=util.CrearMensajeEmbed("Guardando estos estudiantes",mensajeEmbebido),file=discord.File(ruta_pdf))
+                   
+    # Valida si Es iniciar, finalizar o guardar     
+    if Argumento.lower() in util.ArgumentosEmpezar:
         asyncio.create_task(Empezar())
         return
-    else:    
+    elif Argumento.lower() in util.ArgumentosTerminar:    
         asyncio.create_task(Finalizar())
         return
-
-
-# Comando para Guardar las Offices Generadas en PDFs
-@bot.command()
-async def OfficesGuardar(ctx, ID):
-    # Buscar la oficina por ID
-    indiceOffices = 0
-    SeEncontro = False
-    
-    for Content in OfficesAGuardar:
-        
-        if str(Content.Id) == str(ID):
-            Contents = Content
-            SeEncontro = True
-            
-            break
-        indiceOffices += 1
-        
-    if not SeEncontro:
-        await ctx.send("No se encontró la offices.")
+    elif Argumento.lower() in util.ArgumentosGuardar:
+        asyncio.create_task(Guardar())
         return
 
-    # Formatear estudiantes
-    Estudiantes = [
-        util.fomratoEstudiante(user.IdUsuario, user.TiempoTotal)
-        for user in Contents.Usuarios
-    ]
-
-    # Configurar entorno Jinja2
-    ruta_plantillas = os.path.join(os.path.dirname(__file__), 'Plantilla')
-    env = Environment(loader=FileSystemLoader(ruta_plantillas))
-    template = env.get_template('Plantilla.html')
-
-    # Renderizar HTML
-    ahora = datetime.now()
-    html_renderizado = template.render({
-        "Estudiantes": Estudiantes,
-        "Fecha": f"Día {ahora.day} del Mes {ahora.month}",
-        "Offices": ID,
-        "logo": os.path.join(ruta_plantillas, "Logo.png").replace("\\", "/")
-    })
-
-    # Generar PDF con xhtml2pdf
-    ruta_pdf = os.path.join("./Reportes", f"Reporte {ID}.pdf")
-    with open(ruta_pdf, "w+b") as resultado:
-        pisa_status = pisa.CreatePDF(html_renderizado, dest=resultado)
-
-    if pisa_status.err:
-        await ctx.send("Error al generar el PDF.")
-        return
-
-    mensajeEmbebido = ""
-    # Lista de Estudiantes formateada para el mensaje embebido
-    for Estu in Estudiantes:
-        mensajeEmbebido += Estu.toString()
-        
-
-    # Enviar mensaje y PDF
-    #   Actualizacion el mesaje se cambio con una lista en un mesaje embebido
-    ListaEmbebida = discord.Embed(
-        
-        description=mensajeEmbebido,
-        color=discord.Color.blue()
-    )
-    
-    # Se manda el mensaje embebido con su correspondiente archivo y se borra la offices de offices a guardar
-    del OfficesAGuardar[indiceOffices]
-    await ctx.send(embed=ListaEmbebida,file=discord.File(ruta_pdf))
 
 @bot.command()
-async def Obtenerpdf(ctx,Argumento,NombreDeArchivo = " "):
+async def Obtenerpdf(ctx, Argumento, NombreDeArchivo = " "):
     ruta_Pdfs = "./Reportes"
     ListaArchivos = os.listdir(ruta_Pdfs)
     
+    # Validaciones de Argumentos
+    if Argumento.lower() not in util.ArgumentosBuscar + util.ArgumentosEliminar + util.ArgumentosListar:
+        await ctx.send("Error en el Argumento de Inicialización.")
+        return
+    
     async def Listar():
-        mensajeEmbebido = "Lista de Archivos\n"
+        mensajeEmbebido = ""
         try:
             Pdf = [pdfs for pdfs in ListaArchivos]
             #   Genera el mensaje con la lista de pdfs
             for pdf in Pdf:
                 mensajeEmbebido += f"{pdf}\n"
-            ListaEmbebida = discord.Embed(       
-            description=mensajeEmbebido,
-            color=discord.Color.blue()
-            )
-            await ctx.send(embed = ListaEmbebida)
+            
+            await ctx.send(embed = util.CrearMensajeEmbed("Lista de Archivos",mensajeEmbebido))
             return
         
         except:
@@ -224,8 +228,9 @@ async def Obtenerpdf(ctx,Argumento,NombreDeArchivo = " "):
             return
         
     async def buscar():
-        mensajeEmbebido = "Lista de Archivos\n"
+        mensajeEmbebido = ""
         try:
+            # Esto es una busqueda por coincidencias, es decir devuelve todas las coincidencias que encuentre con el id que se le paso
             Pdf = [pdfs for pdfs in ListaArchivos if pdfs.startswith("Reporte " + NombreDeArchivo)]
             if Pdf == []:
                 await ctx.send(f"No se encontro el archivo {NombreDeArchivo}")
@@ -233,11 +238,8 @@ async def Obtenerpdf(ctx,Argumento,NombreDeArchivo = " "):
             
             for pdf in Pdf:
                 mensajeEmbebido += f"{pdf}\n"
-            ListaEmbebida = discord.Embed(       
-            description=mensajeEmbebido,
-            color=discord.Color.green()
-            )
-            await ctx.send(embed = ListaEmbebida)
+            
+            await ctx.send(embed =  util.CrearMensajeEmbed("Lista de Archivos encontrados",mensajeEmbebido,discord.Color.green()))
             return
         except:
             await ctx.send(f"Error Al buscar el pdf")
@@ -260,11 +262,7 @@ async def Obtenerpdf(ctx,Argumento,NombreDeArchivo = " "):
         for pdf in Pdf:
             if pdf == f"Reporte {NombreDeArchivo}.pdf":
                 os.remove(ruta_Pdfs + f"/Reporte {NombreDeArchivo}.pdf")
-                ListaEmbebida = discord.Embed(       
-                description=f"Archivo Eliminado ",
-                color=discord.Color.red()
-                )
-                await ctx.send(embed = ListaEmbebida)
+                await ctx.send(embed =  util.CrearMensajeEmbed("","Archivo Eliminado Correctamente"))
                 return
             
         await ctx.send(f"No se encontro el Id de archivo {NombreDeArchivo}")
