@@ -81,9 +81,9 @@
         <tbody>
             {% for Estudiante in Estudiantes %}
             <tr>
-                <td>{{ Estudiante.nombre }}</td>
+                <td>{{ Estudiante.IdUsuario }}</td>
                 <td>{{ Estudiante.grupo }}</td>
-                <td class="center">{{ Estudiante.cumplimiento }}</td>
+                <td class="center">{{ Estudiante.cumplimientoReal }}</td>
             </tr>
             {% endfor %}
         </tbody>
