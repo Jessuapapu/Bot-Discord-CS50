@@ -1,8 +1,10 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+
 from Clases import util
 from CommandOffices import Empezar, Finalizar, Guardar
+from CommandPdf import Obtener, Eliminar
 
 class Offices(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -26,7 +28,21 @@ class Offices(commands.Cog):
     @app_commands.autocomplete(id=util.officesId_autocomplete)
     async def guardar(self, interaction: discord.Interaction, id: str):
         await Guardar.guardar(interaction, id)
-
+        
+    @offices.command(name="pdf", description="comando para obtener los pdf de las offices")
+    @app_commands.describe(argumento = "Accion a realizar", nombre = "Nombre del archivo")
+    @app_commands.choices(argumento=[
+        discord.app_commands.Choice(name='Obtener', value="Obtener"),
+        discord.app_commands.Choice(name='Eliminar', value="Eliminar")
+    ])
+    @app_commands.autocomplete(nombre=util.Pdfs_autocomplete)
+    async def pdf(self,interation: discord.Interaction, argumento: discord.app_commands.Choice[str], nombre:str):
+        match argumento.value:
+            case "Obtener":
+                await Obtener.obtener(interation,nombre)
+            case "Eliminar":
+                await Eliminar.eliminar(interation,nombre)  
+        return  
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Offices(bot))

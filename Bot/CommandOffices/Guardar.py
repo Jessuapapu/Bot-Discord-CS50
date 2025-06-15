@@ -40,7 +40,7 @@ async def guardar(interaction: discord.Interaction, ID):
     env = Environment(loader=FileSystemLoader(ruta_plantillas))
     template = env.get_template('Plantilla.html')
 
-    ahora = datetime.now()
+    ahora = datetime.datetime.now()
     html_renderizado = template.render({
         "Estudiantes": Contents.Usuarios,
         "Fecha": f"Día {ahora.day} del Mes {ahora.month}",
