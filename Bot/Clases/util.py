@@ -19,9 +19,21 @@ class Offices:
         
         # Es la lista de estudiantes activos
         self.Usuarios = Usuarios
+        self.ListaDeVotos = self.generarListaDevotos() # IdUsuario: (cantidad de votos)
         
         # Se refiere al estado 1: Activa, 0: Finalizada
         self.Estado = 1
+        
+    def generarListaDevotos(self):
+        ListaDeVotos = {}
+        for user in self.Usuarios:
+            ListaDeVotos[user.IdUsuario] = 0
+        return ListaDeVotos
+            
+    def getEstudiantes(self):
+        return [user.IdUsuario for user in self.Usuarios]
+            
+        
 
 class Estudiante:
     def __init__(self, IdUsuario, IdOffices):
@@ -35,7 +47,12 @@ class Estudiante:
         self.cumplimientoReal = 0
 
     def calcularCumplimieto(self):
-        self.cumplimientoReal = round(self.TiempoTotal/3600,1)
+        # Valida si ha estado al menos 30 minutos en la offices
+        if round(self.TiempoTotal/3600,1) > 0.25:
+            self.cumplimientoReal = round(self.TiempoTotal/3600,1)
+        else:
+            self.cumplimientoReal = 0.0
+        
         return
     
     def toString(self):
@@ -53,7 +70,7 @@ class Estudiante:
         except asyncio.CancelledError:
             pass
         
-    
+
 # Funciones Auxiliares
 # Validacion de roles aceptados
 def VerificacionRoles(interaction):
@@ -105,3 +122,13 @@ async def Pdfs_autocomplete(interaction: discord.Interaction, current: str) -> L
     ]
 
     return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
+
+
+# Generar Encuesta con embed
+def CrearEncuestaSimple( Botones:list ):
+    view = discord.ui.View()
+    
+    for boton in Botones:
+        view.add_item(boton.boton)
+    
+    return view

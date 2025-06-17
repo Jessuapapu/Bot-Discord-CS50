@@ -3,7 +3,7 @@ from discord.ext import commands
 from discord import app_commands
 
 from Clases import util
-from CommandOffices import Empezar, Finalizar, Guardar
+from CommandOffices import Empezar, Finalizar, Guardar, Votaciones
 from CommandPdf import Obtener, Eliminar
 
 class Offices(commands.Cog):
@@ -12,10 +12,12 @@ class Offices(commands.Cog):
 
     offices = app_commands.Group(name="offices", description="Comando para gestionar offices")
 
+
     @offices.command(name="empezar", description="Inicia una office")
     @app_commands.describe(id="ID de la Office", canalvoz="Nombre del canal de voz")
     async def empezar(self, interaction: discord.Interaction, id: str, canalvoz: discord.VoiceChannel):
         await Empezar.empezar(interaction, id, canalvoz)
+
 
     @offices.command(name="terminar", description="Finaliza una office")
     @app_commands.describe(id="ID de la Office")
@@ -23,11 +25,13 @@ class Offices(commands.Cog):
     async def terminar(self, interaction: discord.Interaction, id: str):
         await Finalizar.finalizar(interaction, id)
 
+
     @offices.command(name="guardar", description="Guarda una office")
     @app_commands.describe(id="ID de la Office")
     @app_commands.autocomplete(id=util.officesId_autocomplete)
     async def guardar(self, interaction: discord.Interaction, id: str):
         await Guardar.guardar(interaction, id)
+        
         
     @offices.command(name="pdf", description="comando para obtener los pdf de las offices")
     @app_commands.describe(argumento = "Accion a realizar", nombre = "Nombre del archivo")
@@ -44,5 +48,12 @@ class Offices(commands.Cog):
                 await Eliminar.eliminar(interation,nombre)  
         return  
 
+    @offices.command(name="votacion", description="Realiza una votacion para los activos")
+    @app_commands.describe(id="Id de offices activa")
+    @app_commands.autocomplete(id=util.officesId_autocomplete)
+    async def votaciones(self,interation:discord.Interaction,id:str):
+        await Votaciones.votacion(interation,id)
+        
+        
 async def setup(bot: commands.Bot):
     await bot.add_cog(Offices(bot))
