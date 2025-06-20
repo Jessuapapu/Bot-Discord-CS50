@@ -22,7 +22,9 @@ class MyBot(commands.Bot):
         super().__init__(command_prefix="$", intents=intents)
 
     async def setup_hook(self):
-        await self.load_extension("cogs.Offices")  # Aquí cargas tu cog de Offices
+        await self.load_extension("cogs.Offices")
+        await self.load_extension("cogs.Eventos")
+
         await self.tree.sync()
 
 bot = MyBot()

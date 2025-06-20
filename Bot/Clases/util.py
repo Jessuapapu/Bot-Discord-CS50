@@ -5,6 +5,7 @@ import os
 from discord import app_commands
 from typing import List
 from Declaraciones import Declaraciones
+from table2ascii import table2ascii as t2a
 
 Estado = Declaraciones.EstadoGlobal()
 
@@ -21,7 +22,8 @@ class Offices:
         self.Usuarios = Usuarios
         self.ListaDeVotos = self.generarListaDevotos() # IdUsuario: (cantidad de votos)
         
-        # Se refiere al estado 1: Activa, 0: Finalizada
+        
+        # Se refiere al estado, 1: Activa, 0: Finalizada, 2: revision
         self.Estado = 1
         
     def generarListaDevotos(self):
@@ -36,12 +38,12 @@ class Offices:
         
 
 class Estudiante:
-    def __init__(self, IdUsuario, IdOffices):
+    def __init__(self, Usuario, IdOffices):
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su nombre
-        self.IdUsuario = IdUsuario[10:]
-        
+        self.IdUsuario = Usuario.display_name[10:]
+        self.Usuario = Usuario
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su grupo
-        self.grupo = IdUsuario[:7]
+        self.grupo = Usuario.display_name[:7]
         self.IdOffice = IdOffices
         self.TiempoTotal = 0
         self.cumplimientoReal = 0
@@ -55,9 +57,6 @@ class Estudiante:
         
         return
     
-    def toString(self):
-        return f"{self.IdUsuario} | {self.grupo} | {self.cumplimientoReal} \n"
-    
     async def DetenerContador(self, Funcion):
         Funcion.cancel()
         self.calcularCumplimieto()
@@ -69,6 +68,9 @@ class Estudiante:
                 self.TiempoTotal += 1
         except asyncio.CancelledError:
             pass
+    
+    def toString(self):
+        return f"{self.IdUsuario} | {self.grupo} | {self.cumplimientoReal} \n"
         
 
 # Funciones Auxiliares
@@ -83,7 +85,7 @@ def VerificacionRoles(interaction):
     return True
 
 # Crear mensajes embed
-def CrearMensajeEmbed(Titulo = "",descripcion = "", color = discord.Color.blue()):
+def CrearMensajeEmbed(Titulo = "", descripcion = "", color = discord.Color.blue()):
     ListaEmbebida = discord.Embed(  
             title=Titulo,     
             description = descripcion ,
@@ -91,11 +93,18 @@ def CrearMensajeEmbed(Titulo = "",descripcion = "", color = discord.Color.blue()
             )
     return ListaEmbebida
         
-from typing import List
+def CrearTabla(headers: list, Body: list):
+    # In your command:
+    output = t2a(
+        header=headers,
+        body= Body,
+        first_col_heading=True
+    )
+    return output
 
 
 # Función de autocomplete
-async def officesId_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+async def officesActivasId_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
 
     # Obtenemos todos los IDs de offices activas
     opciones = list(Estado.OfficesLista.keys())
@@ -107,6 +116,20 @@ async def officesId_autocomplete(interaction: discord.Interaction, current: str)
     ]
 
     return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
+
+async def officesRevisionId_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+
+    # Obtenemos todos los IDs de offices activas
+    opciones = list(Estado.OfficesRevision.keys())
+
+    # Filtramos por lo que el usuario esté escribiendo (current)
+    resultados = [
+        app_commands.Choice(name=office_id, value=office_id)
+        for office_id in opciones if current.lower() in office_id.lower()
+    ]
+
+    return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
+
 
 # Función de autocomplete
 async def Pdfs_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
@@ -124,9 +147,9 @@ async def Pdfs_autocomplete(interaction: discord.Interaction, current: str) -> L
     return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
 
 
-# Generar Encuesta con embed
-def CrearEncuestaSimple( Botones:list ):
-    view = discord.ui.View()
+# Generar Encuestas
+def CrearEncuestaSimple( Botones:list, tiempo):
+    view = discord.ui.View(timeout = tiempo)
     
     for boton in Botones:
         view.add_item(boton.boton)

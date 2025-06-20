@@ -9,7 +9,7 @@ Estado = Declaraciones.EstadoGlobal()
 async def empezar(interaction: discord.Interaction, ID, CanalDeVoz: discord.VoiceChannel):
 
     miembros = [
-        util.Estudiante(str(miembro.display_name), ID) for miembro in CanalDeVoz.members
+        util.Estudiante(miembro, ID) for miembro in CanalDeVoz.members
         if not any(rol.name in ["Staff", "Admin Discord"] for rol in miembro.roles)
     ]
 

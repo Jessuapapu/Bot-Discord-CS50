@@ -13,4 +13,5 @@ class EstadoGlobal:
         self.OfficesLista = {}      # { str(Id): Offices  }
         self.CanalesDeVoz = []      # Canales de voz monitoreados
         self.ContadoresActivos = {} # { str(user.id): (Estudiante, tarea) }
+        self.OfficesRevision = {}   # { str(Id): Offices  }
         

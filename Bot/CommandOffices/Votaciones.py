@@ -3,10 +3,9 @@ import discord
 from Declaraciones import Declaraciones
 from Clases import util, Botones
 
-from Clases import util
 Estado = Declaraciones.EstadoGlobal()
 
-async def votacion(interaction:discord.Interaction,ID):
+async def votacion(interaction:discord.Interaction,ID,tiempo):
    """
    # Crear los botones para las opciones
    boton = discord.ui.Button(label="Estoy presente", style=discord.ButtonStyle.primary)
@@ -21,12 +20,12 @@ async def votacion(interaction:discord.Interaction,ID):
    await interaction.response.send_message(message, view=view, ephemeral=False)
    """
    
-   botones = [Botones.botonesAsistencia("Estoy Presente!",discord.ButtonStyle.success,ID),Botones.botonesAsistencia("No Estoy Presente!",discord.ButtonStyle.danger,ID)]
+   botones = [Botones.botonesAsistencia("Estoy Presente!",discord.ButtonStyle.premium)]
    
-   view = util.CrearEncuestaSimple(botones)
+   view = util.CrearEncuestaSimple(botones,tiempo)
    embed = util.CrearMensajeEmbed("Confirmaciones de Asistencia","Votaciones de control \n ¿Estas aun aqui?")
    
-   # ephemerl es para que solo la persona que lo envio le salga el mensaje
+   # ephemeral es para que solo la persona que lo envio le salga el mensaje
    await interaction.response.send_message(embed=embed, view=view, ephemeral=False)     
    return
 

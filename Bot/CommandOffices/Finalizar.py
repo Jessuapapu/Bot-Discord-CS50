@@ -6,12 +6,13 @@ from Clases import util
 Estado = Declaraciones.EstadoGlobal()
 
 async def finalizar(interaction: discord.Interaction, ID):
-    if len(Estado.OfficesLista) == 0 or Estado.OfficesLista[ID].Estado == 0:
+    if len(Estado.OfficesLista) == 0 or  not Estado.OfficesLista.get(ID,None) or Estado.OfficesLista[ID].Estado == 0:
         await interaction.response.send_message("No hay offices activas o la offices no esta activa")
         return
 
     keys = []
-    mensajeEmbed = f""
+    headerTabla = ["Nombre", "Grupo", "Cumplimiento", "votos"]
+    contenidoTabla = []
 
     for contador in Estado.ContadoresActivos:
         Estudiante, tarea = Estado.ContadoresActivos[contador]
@@ -19,14 +20,22 @@ async def finalizar(interaction: discord.Interaction, ID):
         if Estudiante.IdOffice == ID:
             keys.append(Estudiante.IdUsuario)
             await Estudiante.DetenerContador(tarea)
-            mensajeEmbed += Estudiante.toString()
+            #mensajeEmbed += f"{Estudiante.toString()} {} \n"
             
-    await interaction.response.send_message(embed=util.CrearMensajeEmbed("Lista de Estudiantes", mensajeEmbed, discord.Color.dark_gold()))
+            #                      Nombre del estudiante     grupo                   horas                      votos
+            contenidoTabla.append([Estudiante.IdUsuario, Estudiante.grupo, Estudiante.cumplimientoReal, Estado.OfficesLista[ID].ListaDeVotos[Estudiante.IdUsuario]])  
+    
+    tabla = util.CrearTabla(headerTabla,contenidoTabla)
+    embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
+            
+    await interaction.response.send_message(embed=embed)
+
 
     # Establecemos el Estado = 0 para finalizarla
     Office = Estado.OfficesLista[ID]
     Office.Estado = 0
-    Estado.OfficesLista[ID] = Office 
+    Estado.OfficesLista.pop(ID)
+    Estado.OfficesRevision[ID] = Office 
     
 
     for key in keys:

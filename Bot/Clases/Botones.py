@@ -31,3 +31,4 @@ class botonesAsistencia(botonBase):
             await interaction_button.response.send_message("✅ Tu voto ha sido registrado.", ephemeral=True)
         else:
             await interaction_button.response.send_message("⚠ No estás registrado en esta Office.", ephemeral=True)
+

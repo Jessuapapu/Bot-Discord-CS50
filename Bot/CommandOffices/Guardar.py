@@ -18,7 +18,7 @@ from Clases import util
 
 async def guardar(interaction: discord.Interaction, ID):
     try:
-        Contents = Estado.OfficesLista[ID]
+        Contents = Estado.OfficesRevision[ID]
     except:
         await interaction.response.send_message("No se encontró la offices.")
         return
@@ -56,10 +56,16 @@ async def guardar(interaction: discord.Interaction, ID):
         await interaction.response.send_message.send("Error al generar el PDF.")
         return
 
+    headerTabla = ["Nombre", "Grupo", "Cumplimiento", "votos"]
+    contenidoTabla = []
+    
     mensajeEmbebido = ""
     for Estu in Contents.Usuarios:
-        mensajeEmbebido += Estu.toString()
+        contenidoTabla.append([Estu.IdUsuario, Estu.grupo, Estu.cumplimientoReal, Estado.OfficesRevision[ID].ListaDeVotos[Estu.IdUsuario]])  
+    
+    tabla = util.CrearTabla(headerTabla,contenidoTabla)
+    embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
 
-    del Estado.OfficesLista[ID]
-    await interaction.response.send_message(embed=util.CrearMensajeEmbed("Guardando estos estudiantes", mensajeEmbebido), file=discord.File(ruta_pdf))
+    del Estado.OfficesRevision[ID]
+    await interaction.response.send_message(embed=embed, file=discord.File(ruta_pdf))
     return
