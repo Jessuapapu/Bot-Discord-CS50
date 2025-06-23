@@ -6,17 +6,20 @@ from discord import app_commands
 from typing import List
 from Declaraciones import Declaraciones
 from table2ascii import table2ascii as t2a
+import datetime
 
 Estado = Declaraciones.EstadoGlobal()
 
+
 class Offices:
-    def __init__(self, Id, IdUsuario, Usuarios: list):
+    def __init__(self, Id, IdUsuario, Usuarios: list,bloque):
+        hora = datetime.datetime.now()
         
-        # Id se refiere a su numero de offices
+        # Informacion de la offices
         self.Id = Id
-        
-        # Es el que creo la offices
         self.IdUsuario = IdUsuario
+        self.HoraCreacion = hora.strftime("%H:%M")
+        self.bloque = bloque
         
         # Es la lista de estudiantes activos
         self.Usuarios = Usuarios
@@ -121,6 +124,21 @@ async def officesRevisionId_autocomplete(interaction: discord.Interaction, curre
 
     # Obtenemos todos los IDs de offices activas
     opciones = list(Estado.OfficesRevision.keys())
+
+    # Filtramos por lo que el usuario esté escribiendo (current)
+    resultados = [
+        app_commands.Choice(name=office_id, value=office_id)
+        for office_id in opciones if current.lower() in office_id.lower()
+    ]
+
+    return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
+
+
+# Función de autocomplete
+async def officesTotal_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+
+    # Obtenemos todos los IDs de offices activas
+    opciones = list(Estado.OfficesLista.keys()) + list(Estado.OfficesRevision.keys()) 
 
     # Filtramos por lo que el usuario esté escribiendo (current)
     resultados = [

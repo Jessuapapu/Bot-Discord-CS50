@@ -12,7 +12,8 @@ async def ruletita(interaction:discord.Interaction, CanalDeVoz: discord.VoiceCha
         miembro for miembro in CanalDeVoz.members
         if not any(rol.name in ["Staff", "Admin Discord"] for rol in miembro.roles)
     ]
-    
+    if miembros == []:
+        await interaction.response.send_message(content="No hay nadie activo")
     ElElegido = random.choice(miembros)
 
     ruta_base = os.path.dirname(os.path.dirname(__file__))

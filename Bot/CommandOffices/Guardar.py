@@ -17,11 +17,8 @@ from Clases import util
 
 
 async def guardar(interaction: discord.Interaction, ID):
-    try:
-        Contents = Estado.OfficesRevision[ID]
-    except:
-        await interaction.response.send_message("No se encontró la offices.")
-        return
+
+    Contents = Estado.OfficesRevision[ID]
 
     if Contents.Estado != 0:
         await interaction.response.send_message("No se ha finalizado la offices.")
@@ -44,6 +41,7 @@ async def guardar(interaction: discord.Interaction, ID):
     html_renderizado = template.render({
         "Estudiantes": Contents.Usuarios,
         "Fecha": f"Día {ahora.day} del Mes {ahora.month}",
+        "Bloque": Contents.bloque,
         "Offices": ID,
         "logo": os.path.join(ruta_plantillas, "Logo.png").replace("\\", "/")
     })

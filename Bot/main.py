@@ -2,9 +2,7 @@ import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
-
-# Modulos propios
-from Clases import util
+import webserver
 
 # Cargamos el .env
 load_dotenv()
@@ -24,11 +22,12 @@ class MyBot(commands.Bot):
     async def setup_hook(self):
         await self.load_extension("cogs.Offices")
         await self.load_extension("cogs.Eventos")
-
         await self.tree.sync()
+
 
 bot = MyBot()
     
 
 # Finalmente arrancamos el bot
+webserver.keep_alive()
 bot.run(TOKEN)

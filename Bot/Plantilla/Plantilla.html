@@ -5,54 +5,61 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 30px;
-        }
-
-        table.header {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        table.header td {
-            vertical-align: top;
-        }
-
-        .info-texto {
-            font-size: 16px;
-        }
-
-        table.data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-        thead {
-            background-color: #e0e0e0;
-        }
-
-        th, td {
-            border: 0.5px solid #666;
-            padding: 6px 10px;
-            text-align: left;
-        }
-
-        th {
-            font-weight: bold;
+            font-size: 12px;
+            margin: 40px;
             color: #333;
         }
 
-        tbody tr:nth-child(even) {
-            background-color: #f7f7f7;
+        .header {
+            width: 100%;
+            margin-bottom: 30px;
         }
 
-        tbody td:first-child {
-            font-weight: bold;
+        .info-texto p {
+            margin: 4px 0;
+        }
+
+        img {
+            height: 50px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead {
+            background-color: #4a90e2;
+            color: white;
+        }
+
+        th, td {
+            border: 1px solid #999;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f1f5fa;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #ffffff;
         }
 
         .center {
             text-align: center;
+        }
+
+        td:first-child {
+            font-weight: bold;
         }
     </style>
 </head>
@@ -60,17 +67,20 @@
 
     <table class="header">
         <tr>
-            <td style="padding-right: 10px;">
-                <img src="{{ logo }}" style="height: 60px;">
+            <td style="padding-right: 20px;">
+                <img src="{{ logo }}">
             </td>
             <td class="info-texto">
-                <p>{{ Fecha }}</p>
-                <p>{{ Offices }}</p>
+                <p><strong>Fecha:</strong> {{ Fecha }}</p>
+                <p><strong>Bloque:</strong> {{ Bloque }}</p>
+                <p><strong>Número de Offices:</strong> {{ Offices }}</p>
             </td>
         </tr>
     </table>
-    
-    <table class="data-table">
+
+    <h2>Listado de Estudiantes</h2>
+
+    <table>
         <thead>
             <tr>
                 <th>Nombre</th>

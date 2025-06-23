@@ -1,11 +1,14 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
+from typing import Optional
 
 from Clases import util
 from Clases.Decoradores import valida_id_office, valida_roles 
-from CommandOffices import Empezar, Finalizar, Guardar, Votaciones, Ruleta, Editar
+from CommandOffices import Empezar, Finalizar, Guardar, Votaciones, Ruleta, Editar, Listar, Mover
 from CommandPdf import Obtener, Eliminar
+
+
 
 class Offices(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -13,12 +16,16 @@ class Offices(commands.Cog):
 
     offices = app_commands.Group(name="offices", description="Comando para gestionar offices")
 
-
     @offices.command(name="empezar", description="Inicia una office")
-    @app_commands.describe(id="ID de la Office", canalvoz="Nombre del canal de voz")
+    @app_commands.describe(id="ID de la Office", canalvoz="Nombre del canal de voz", bloque="El bloque de la offices")
+    @app_commands.choices(bloque=[
+        discord.app_commands.Choice(name='10-12', value="10-12"),
+        discord.app_commands.Choice(name='1-3', value="1-3"),
+        discord.app_commands.Choice(name='3-5', value="3-5")
+    ])  
     @valida_roles()
-    async def empezar(self, interaction: discord.Interaction, id: str, canalvoz: discord.VoiceChannel):
-        await Empezar.empezar(interaction, id, canalvoz)
+    async def empezar(self, interaction: discord.Interaction, id: str, canalvoz: discord.VoiceChannel, bloque: discord.app_commands.Choice[str]):
+        await Empezar.empezar(interaction, id, canalvoz,bloque.value)
 
 
 
@@ -61,7 +68,6 @@ class Offices(commands.Cog):
         
         # Si no se retorna con ninguno de los casos
         await interation.response.send_message("Error en el accion a realizar")
-        
         return  
 
 
@@ -88,13 +94,50 @@ class Offices(commands.Cog):
         
     
     
-    @offices.command(name="editar", description="Edita una office ya terminada")
-    @app_commands.describe(id="ID de la Office")
-    @app_commands.autocomplete(id=util.officesRevisionId_autocomplete)
+    @offices.command(name="editar", description="Edita una office o a un estudiante")
+    @app_commands.describe(id="ID de la Office",accion="Si quieres editar una offices o un estusiante")
+    @app_commands.choices(accion=[
+        discord.app_commands.Choice(name='Offices', value="offices"),
+        discord.app_commands.Choice(name='Estudiantes', value="estudiantes")
+    ])
+    @app_commands.autocomplete(id=util.officesTotal_autocomplete)
     @valida_roles()
     @valida_id_office()
-    async def editar(self, interaction: discord.Interaction, id: str):
-        await Editar.Editar(interaction,id)
+    async def editar(self, interaction: discord.Interaction, id: str, accion: discord.app_commands.Choice[str]):
+        if accion.value == "offices":
+            await Editar.EditarOffices(interaction,id)
+        elif accion.value == "estudiantes":
+            await Editar.EditarEstudiante(interaction,id)
+        else:
+            await interaction.response.send_message("Error al obtenr la accion, escoge uno de las dos opciones")
         
+        
+        
+    @offices.command(name="listar",description="Lista todas la offices o a la lista de estudiantes de una offices")
+    @app_commands.describe(lista="Si quiere Listar una offices o los usuarios de una offices",id="Identificador de la offices, solo si vas a listar a los estudiantes")
+    @app_commands.choices(lista=[
+        discord.app_commands.Choice(name='Offices', value="offices"),
+        discord.app_commands.Choice(name='Estudiantes', value="estudiantes")
+    ])
+    @app_commands.autocomplete(id=util.officesTotal_autocomplete)
+    @valida_roles()
+    async def listar(self,interaction: discord.Interaction, lista: discord.app_commands.Choice[str], id: Optional[str] = None):
+        if lista.value == "offices":
+            await Listar.ListaOffices(interaction)
+        elif lista.value == "estudiantes":
+            await Listar.ListaEstudiantes(interaction,id)
+        else:
+            await interaction.response.send_message("Error al obtenr el metodo de listar, escoge uno de las dos opciones")
+            
+        
+    @offices.command(name="mover", description="Mueve al autor del comando y a otro usuario a un canal de voz. sin que se pause su tiempo")
+    @app_commands.describe(
+        canal="Canal de voz al que serán movidos",
+        miembro="Otro miembro que quieres mover"
+    ) 
+    async def mover(self,interaction: discord.Interaction, canal: discord.VoiceChannel, miembro: discord.Member):
+        await Mover.Mover(interaction,canal,miembro)
+            
+                
 async def setup(bot: commands.Bot):
     await bot.add_cog(Offices(bot))
