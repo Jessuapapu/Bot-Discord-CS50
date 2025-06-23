@@ -20,7 +20,7 @@ async def votacion(interaction:discord.Interaction,ID,tiempo):
    await interaction.response.send_message(message, view=view, ephemeral=False)
    """
    
-   botones = [Botones.botonesAsistencia("Estoy Presente!",discord.ButtonStyle.premium)]
+   botones = [Botones.botonesAsistencia("Estoy Presente!",discord.ButtonStyle.premium,ID)]
    
    view = util.CrearEncuestaSimple(botones,tiempo)
    embed = util.CrearMensajeEmbed("Confirmaciones de Asistencia","Votaciones de control \n ¿Estas aun aqui?")

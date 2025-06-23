@@ -21,7 +21,7 @@ async def empezar(interaction: discord.Interaction, ID, CanalDeVoz: discord.Voic
         tarea = asyncio.create_task(miembro.CalcularTiempo())
         Estado.ContadoresActivos[miembro.IdUsuario] = (miembro, tarea)
 
-    Office = util.Offices(ID, interaction.user.display_name, miembros, Bloque)
+    Office = util.Offices(ID, interaction.user.display_name[8:], miembros, Bloque)
     Estado.CanalesDeVoz.append(CanalDeVoz.id)
     Estado.OfficesLista[ID] = Office
     

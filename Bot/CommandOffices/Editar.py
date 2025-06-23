@@ -8,8 +8,13 @@ Estado = Declaraciones.EstadoGlobal()
 async def EditarEstudiante(interaction: discord.Interaction, IDOffices):
     headerTabla = ["Nombre", "Grupo", "Cumplimiento", "votos"]
     contenidoTabla = []
-
-    Contents = Estado.OfficesRevision[IDOffices]
+    Contents = None
+    try:
+        Contents = Estado.OfficesRevision[IDOffices]
+    except:
+        Contents = Estado.OfficesLista[IDOffices]
+    
+    
     for estu in Contents.Usuarios:
         contenidoTabla.append([
             estu.IdUsuario,
