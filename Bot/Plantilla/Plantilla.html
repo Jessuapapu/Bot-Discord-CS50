@@ -1,56 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            color: #000;
-            margin: 20px;
-        }
-
-        .header {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        img {
-            height: 40px;
-        }
-
-        .info-texto p {
-            margin: 2px 0;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 10px;
-        }
-
-        table {
-            width: 100%;
-            border: 1px solid #000;
-            border-spacing: 0;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid #000;
-            padding: 4px;
-            font-size: 11px;
-        }
-
-        th {
-            background-color: #ccc;
         }
 
         .center {
             text-align: center;
-        }
-
-        td:first-child {
-            font-weight: bold;
         }
     </style>
 </head>
@@ -58,8 +9,8 @@
 
     <table class="header">
         <tr>
-            <td style="width: 60px;">
-                <img src="{{ logo }}">
+            <td style="padding-right: 10px;">
+                <img src="{{ logo }}" style="height: 60px;">
             </td>
             <td class="info-texto">
                 <p><strong>Fecha:</strong> {{ Fecha }}</p>
@@ -68,22 +19,24 @@
             </td>
         </tr>
     </table>
-
-    <h2>Listado de Estudiantes</h2>
-
-    <table>
-        <tr>
-            <th>Nombre</th>
-            <th>Grupo</th>
-            <th class="center">Cumplimiento (horas)</th>
-        </tr>
-        {% for Estudiante in Estudiantes %}
-        <tr>
-            <td>{{ Estudiante.IdUsuario }}</td>
-            <td>{{ Estudiante.grupo }}</td>
-            <td class="center">{{ Estudiante.cumplimientoReal }}</td>
-        </tr>
-        {% endfor %}
+    
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Grupo</th>
+                <th class="center">Cumplimiento (horas)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for Estudiante in Estudiantes %}
+            <tr>
+                <td>{{ Estudiante.nombre }}</td>
+                <td>{{ Estudiante.grupo }}</td>
+                <td class="center">{{ Estudiante.cumplimiento }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
 </body>
