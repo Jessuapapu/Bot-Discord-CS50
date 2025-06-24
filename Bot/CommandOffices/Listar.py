@@ -13,7 +13,7 @@ async def ListaOffices(interaction:discord.Interaction):
         ListaOffices.append(Estado.OfficesRevision[oh])
     
     
-    headers = ["ID", "Creador", "Hora de Creacion", "Bloque", "Estado"]
+    headers = ["ID", "Creador", "Hora", "Bloque", "Estado"]
     contenido = []
     
     for offices in ListaOffices:
