@@ -25,8 +25,7 @@ class Offices:
         self.Usuarios = Usuarios
         self.ListaDeVotos = self.generarListaDevotos() # IdUsuario: (cantidad de votos)
         
-        
-        # Se refiere al estado, 1: Activa, 0: Finalizada, 2: revision
+        # Se refiere al estado, 1: Activa, 0: Finalizada
         self.Estado = 1
         
     def generarListaDevotos(self):

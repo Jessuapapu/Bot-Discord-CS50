@@ -98,7 +98,10 @@ class formularioEditarOffices(discord.ui.Modal):
         Offices.Id = self.Input1.value
         Offices.bloque = self.Input2.value
         
-        Estado.OfficesRevision[Offices.Id] = Offices
+        if Offices.Estado == 0:
+            Estado.OfficesRevision[Offices.Id] = Offices
+        elif Offices.Estado == 1:
+            Estado.OfficesLista[Offices.Id] = Offices
         
         await interaction.response.send_message("Offices editada Correctamente :)")
         
