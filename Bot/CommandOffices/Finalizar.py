@@ -11,7 +11,7 @@ async def finalizar(interaction: discord.Interaction, ID):
         return
 
     keys = []
-    headerTabla = ["Nombre", "Grupo", "Cumplimiento", "votos"]
+    headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
 
     for contador in Estado.ContadoresActivos:

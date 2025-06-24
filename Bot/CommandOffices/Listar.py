@@ -41,7 +41,7 @@ async def ListaEstudiantes(interaction:discord.Interaction, ID):
             await interaction.response.send_message("Error al obtener la lista de usuarios de la offices indicada o no existe",ephemeral=True)
             return
         
-    headerTabla = ["Nombre", "Grupo", "Cumplimiento", "votos"]
+    headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
     for Estudiante in listaEstu.Usuarios:
         contenidoTabla.append([Estudiante.IdUsuario, Estudiante.grupo, Estudiante.cumplimientoReal, listaEstu.ListaDeVotos[Estudiante.IdUsuario]]) 

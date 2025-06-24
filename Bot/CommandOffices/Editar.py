@@ -6,7 +6,7 @@ from Clases import util, SelectMenus
 Estado = Declaraciones.EstadoGlobal()
 
 async def EditarEstudiante(interaction: discord.Interaction, IDOffices):
-    headerTabla = ["Nombre", "Grupo", "Cumplimiento", "votos"]
+    headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
     Contents = None
     try:
