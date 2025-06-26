@@ -5,6 +5,7 @@ import time
 
 import asyncio
 from Declaraciones import Declaraciones
+from Clases import util
 Estado = Declaraciones.EstadoGlobal()
 
 
@@ -60,20 +61,42 @@ class Eventos(commands.Cog):
             await message.channel.send(f"{message.author.mention}, estás enviando mensajes demasiado rápido.")
             return
         
+        
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        user_id = str(member.display_name)
+        user_id = str(member.display_name[10:])  # O usa str(member.id) si es mejor para tu lógica
 
+        # SALIDA DEL CANAL DE VOZ
         if before.channel and (after.channel is None or before.channel != after.channel):
             if before.channel.id in Estado.CanalesDeVoz and user_id in Estado.ContadoresActivos:
                 estudiante, tarea = Estado.ContadoresActivos[user_id]
                 await estudiante.DetenerContador(tarea)
+
+        # ENTRADA A CANAL DE VOZ
         elif after.channel and after.channel.id in Estado.CanalesDeVoz:
             if user_id in Estado.ContadoresActivos:
+                # Ya está registrado, solo se reactiva el contador
                 estudiante, _ = Estado.ContadoresActivos[user_id]
                 nueva_tarea = asyncio.create_task(estudiante.CalcularTiempo())
                 Estado.ContadoresActivos[user_id] = (estudiante, nueva_tarea)
-
+            else:
+                # NO está registrado —> enviar botón de confirmación
+                for id_oficina, oficina in Estado.OfficesLista.items():
+                    if oficina.IdCanal == after.channel.id:
+                        view = discord.ui.View()
+                        view.add_item(util.botonesEntrarOffices("Entrar a oficina", discord.ButtonStyle.green, id_oficina, user_id))
+                        try:
+                            await member.send(
+                                f"Hola {member.display_name}, ¿deseas unirte a la oficina virtual?",
+                                view=view
+                            )
+                        except discord.Forbidden:
+                            canal_texto = after.channel.guild.get_channel(after.channel.id + 1)
+                            if canal_texto:
+                                await canal_texto.send(
+                                    f"{member.mention}, ¿quieres entrar a la oficina?",
+                                    view=view
+                                )
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Eventos(bot))

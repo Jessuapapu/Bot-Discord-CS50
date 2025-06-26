@@ -1,5 +1,7 @@
 import discord
 from Declaraciones import Declaraciones
+from Clases import util
+import asyncio
 
 Estado = Declaraciones.EstadoGlobal()
 
@@ -31,4 +33,24 @@ class botonesAsistencia(botonBase):
             await interaction_button.response.send_message("✅ Tu voto ha sido registrado.", ephemeral=True)
         else:
             await interaction_button.response.send_message("⚠ No estás registrado en esta Office.", ephemeral=True)
+            
+
+class botonesEntrarOffices(botonBase):
+    def __init__(self, label, style, IdOffices, Miembro):
+        super().__init__(label, style)
+        self.IdOffices = IdOffices
+        self.miembro = Miembro  # string del ID de usuario
+        self.boton.callback = self.callBack
+
+    async def callBack(self, interaction: discord.Interaction):
+        if str(interaction.user.display_name[10:]) == self.miembro:
+            NuevoEstu = util.Estudiante(self.miembro, self.IdOffices)
+            Estado.OfficesLista[self.IdOffices].Usuarios.append(NuevoEstu)
+            tarea = asyncio.create_task(NuevoEstu.calcularCumplimieto())
+            Estado.ContadoresActivos[NuevoEstu.IdUsuario] = (NuevoEstu, tarea)
+            await interaction.response.send_message("Has sido añadido a la oficina correctamente.", ephemeral=True)
+        else:
+            await interaction.response.send_message("No puedes usar este botón.", ephemeral=True)
+
+    
 

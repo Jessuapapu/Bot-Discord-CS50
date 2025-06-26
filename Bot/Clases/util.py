@@ -12,7 +12,7 @@ Estado = Declaraciones.EstadoGlobal()
 
 
 class Offices:
-    def __init__(self, Id, IdUsuario, Usuarios: list,bloque):
+    def __init__(self, Id, IdUsuario, Usuarios: list, bloque, CanalVoz: discord.VoiceChannel):
         hora = datetime.datetime.now()
         
         # Informacion de la offices
@@ -20,6 +20,7 @@ class Offices:
         self.IdUsuario = IdUsuario
         self.HoraCreacion = hora.strftime("%H:%M")
         self.bloque = bloque
+        self.canal = CanalVoz 
         
         # Es la lista de estudiantes activos
         self.Usuarios = Usuarios
@@ -158,7 +159,7 @@ async def Pdfs_autocomplete(interaction: discord.Interaction, current: str) -> L
     # Filtramos por lo que el usuario esté escribiendo (current)
     resultados = [
         app_commands.Choice(name=Pdf, value=Pdf)
-        for Pdf in ListaArchivos if current.lower() in Pdf.lower()
+        for Pdf in ListaArchivos if current.lower() in Pdf.lower() and Pdf != 'si.txt'
     ]
 
     return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
