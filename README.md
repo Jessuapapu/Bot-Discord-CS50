@@ -1,7 +1,7 @@
 
 # 🤖 Bot Discord CS50
 
-Este bot de Discord fue creado para asistir en la gestión de estudiantes y oficinas dentro del contexto del curso **CS50**. Utiliza interfaces interactivas como `Modals` y `Selects` para permitir una experiencia fluida y validada para los usuarios y administradores.
+Este bot de Discord fue creado para asistir en la gestión de estudiantes y offices dentro del contexto del curso **CS50**. Utiliza interfaces interactivas como `Modals` y `Selects` para permitir una experiencia fluida y validada para los usuarios y administradores.
 
 ---
 
