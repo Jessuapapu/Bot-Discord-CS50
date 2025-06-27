@@ -58,7 +58,6 @@ class Eventos(commands.Cog):
 
         if len(spam_tracker[user_id]) > SPAM_THRESHOLD:
             await message.delete()
-            await message.channel.send(f"{message.author.mention}, estás enviando mensajes demasiado rápido.")
             return
         
         
