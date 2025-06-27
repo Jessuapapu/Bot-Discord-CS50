@@ -52,7 +52,6 @@ class SelectOffices(discord.ui.Select):
     def __init__(self, IDOffices):
         self.IDOffices = IDOffices
 
-
         options = [
             discord.SelectOption(label=Office, description=f"Offices: {Office}")
             for Office in list(Estado.OfficesLista.keys()) + list(Estado.OfficesRevision.keys()) 
@@ -71,3 +70,18 @@ class SelectOffices(discord.ui.Select):
         await interaction.response.send_modal(modal)
         
 
+"""class SelectAgregarAOffices(discord.ui.Select):
+    def __init__(self, IdOffices, ListaEstudiantes):
+        self.IdOffices = IdOffices
+        options = ListaEstudiantes
+        
+        super.__init__(
+            placeholder="Selecciona a un estudiante para agregar...",
+            min_values=1,
+            max_values=1,
+            options=options
+        )
+        
+    async def callback(self, interaction: discord.Interaction):
+        seleccionado = self.values[0]
+        await """

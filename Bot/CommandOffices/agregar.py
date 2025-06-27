@@ -4,36 +4,7 @@ from Clases import util, SelectMenus
 
 Estado = Declaraciones.EstadoGlobal()
 
-async def EditarEstudiante(interaction: discord.Interaction, IDOffices):
-    headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
-    contenidoTabla = []
-    Contents = None
-    try:
-        Contents = Estado.OfficesRevision[IDOffices]
-    except:
-        Contents = Estado.OfficesLista[IDOffices]
-    
-    
-    for estu in Contents.Usuarios:
-        contenidoTabla.append([
-            estu.IdUsuario,
-            estu.grupo,
-            estu.cumplimientoReal,
-            Contents.ListaDeVotos[estu.IdUsuario]
-        ])
-
-    tabla = util.CrearTabla(headerTabla, contenidoTabla)
-    embed = util.CrearMensajeEmbed(
-        "Estudiantes disponibles para editar",
-        f"Selecciona uno del menú.\n```\n{tabla}\n```",
-        discord.Color.dark_gold()
-    )
-
-    view = SelectMenus.SelectEstudianteView(Contents.Usuarios, IDOffices)
-    await interaction.response.send_message(embed=embed, view=view)
-
-
-async def EditarOffices(interaction: discord.Interaction, IDOffices):
+async def agregarEstuOffices(interaction: discord.Interaction, IDOffices):
     ListaOffices = []
     
     for oh in Estado.OfficesLista:
