@@ -6,7 +6,7 @@ from Clases import util
 Estado = Declaraciones.EstadoGlobal()
 
 async def finalizar(interaction: discord.Interaction, ID):
-    if len(Estado.OfficesLista) == 0 or  not Estado.OfficesLista.get(ID,None) or Estado.OfficesLista[ID].Estado == 0:
+    if len(Estado.OfficesLista) == 0 or not Estado.OfficesLista.get(ID,None) or Estado.OfficesLista[ID].Estado == 0:
         await interaction.response.send_message("No hay offices activas o la offices no esta activa")
         return
 

@@ -44,7 +44,7 @@ async def ListaEstudiantes(interaction:discord.Interaction, ID):
     headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
     for Estudiante in listaEstu.Usuarios:
-        contenidoTabla.append([Estudiante.IdUsuario, Estudiante.grupo, Estudiante.cumplimientoReal, listaEstu.ListaDeVotos[Estudiante.IdUsuario]]) 
+        contenidoTabla.append([Estudiante.IdUsuario, Estudiante.grupo, Estudiante.TiempoTotal, listaEstu.ListaDeVotos[Estudiante.IdUsuario]]) 
         
     tabla = util.CrearTabla(headerTabla,contenidoTabla)
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())

@@ -43,7 +43,7 @@ async def EditarOffices(interaction: discord.Interaction, IDOffices):
         ListaOffices.append(Estado.OfficesRevision[oh])
     
     
-    headers = ["ID", "Creador", "Hora de Creacion", "Bloque", "Estado"]
+    headers = ["ID", "Creador", "Hora", "Bloque", "Estado"]
     contenido = []
     
     for offices in ListaOffices:
@@ -59,4 +59,4 @@ async def EditarOffices(interaction: discord.Interaction, IDOffices):
     embed = util.CrearMensajeEmbed("Offices Listadas", f"```\n{tabla}\n```" ,discord.Color.dark_magenta())
     
     view = SelectMenus.SelectOfficesView(IDOffices)
-    await interaction.response.send_message(embed=embed, view=view)
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)

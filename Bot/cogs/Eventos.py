@@ -5,7 +5,7 @@ import time
 
 import asyncio
 from Declaraciones import Declaraciones
-from Clases import util
+from Clases import util, Botones
 Estado = Declaraciones.EstadoGlobal()
 
 
@@ -64,8 +64,12 @@ class Eventos(commands.Cog):
         
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        user_id = str(member.display_name[10:])  # O usa str(member.id) si es mejor para tu lógica
-
+        user_id = str(member.display_name[10:])
+        AutorRoles = [rol.name for rol in member.roles] 
+        
+        if any(rol in ["Staff", "Admin Staff"] for rol in AutorRoles):
+            return
+        
         # SALIDA DEL CANAL DE VOZ
         if before.channel and (after.channel is None or before.channel != after.channel):
             if before.channel.id in Estado.CanalesDeVoz and user_id in Estado.ContadoresActivos:
@@ -82,12 +86,11 @@ class Eventos(commands.Cog):
             else:
                 # NO está registrado —> enviar botón de confirmación
                 for id_oficina, oficina in Estado.OfficesLista.items():
-                    if oficina.IdCanal == after.channel.id:
-                        view = discord.ui.View()
-                        view.add_item(util.botonesEntrarOffices("Entrar a oficina", discord.ButtonStyle.green, id_oficina, user_id))
+                    if oficina.canal.id == after.channel.id:
+                        view = util.CrearEncuestaSimple([Botones.botonesEntrarOffices("Entrar a oficina", discord.ButtonStyle.green, id_oficina, member)],120)
                         try:
                             await member.send(
-                                f"Hola {member.display_name}, ¿deseas unirte a la oficina virtual?",
+                                f"Hola {member.display_name[10:]}, ¿deseas unirte a la offices?",
                                 view=view
                             )
                         except discord.Forbidden:

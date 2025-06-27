@@ -5,27 +5,36 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            padding: 30px;
+            padding: 20px;
         }
 
         table.header {
             width: 100%;
-            margin-bottom: 20px;
+            border-collapse: collapse;
+            margin-bottom: 10px;
         }
 
         table.header td {
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         .info-texto {
-            font-size: 16px;
+            font-size: 10px;
+            line-height: 1.3;
+        }
+
+        .logo-container img {
+            height: 45px;
+            width: auto; /* evita estiramiento horizontal */
+            display: block;
         }
 
         table.data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 10px;
+            font-size: 9px;
+            table-layout: fixed;
         }
 
         thead {
@@ -34,13 +43,29 @@
 
         th, td {
             border: 0.5px solid #666;
-            padding: 6px 10px;
+            padding: 3px 5px;
             text-align: left;
+            word-wrap: break-word;
         }
 
         th {
             font-weight: bold;
             color: #333;
+        }
+
+        th:nth-child(1),
+        td:nth-child(1) {
+            width: 45%;
+        }
+
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 30%;
+        }
+
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 25%;
         }
 
         tbody tr:nth-child(even) {
@@ -60,8 +85,8 @@
 
     <table class="header">
         <tr>
-            <td style="padding-right: 10px;">
-                <img src="{{ logo }}" style="height: 60px;">
+            <td class="logo-container">
+                <img src="{{ logo }}">
             </td>
             <td class="info-texto">
                 <p><strong>Fecha:</strong> {{ Fecha }}</p>

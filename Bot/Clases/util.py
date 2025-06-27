@@ -33,6 +33,7 @@ class Offices:
         ListaDeVotos = {}
         for user in self.Usuarios:
             ListaDeVotos[user.IdUsuario] = 0
+            
         return ListaDeVotos
             
     def getEstudiantes(self):
@@ -50,11 +51,22 @@ class Estudiante:
         self.IdOffice = IdOffices
         self.TiempoTotal = 0
         self.cumplimientoReal = 0
+        
 
     def calcularCumplimieto(self):
         # Valida si ha estado al menos 30 minutos en la offices
-        if round(self.TiempoTotal/3600,1) > 0.25:
-            self.cumplimientoReal = round(self.TiempoTotal/3600,1)
+        if round(self.TiempoTotal/3600,1) >= 2:
+            self.cumplimientoReal = 2.0
+        
+        elif round(self.TiempoTotal/3600,1) >= 1.5:
+            self.cumplimientoReal = 1.5
+        
+        elif round(self.TiempoTotal/3600,1) >= 1:
+            self.cumplimientoReal = 1
+            
+        elif round(self.TiempoTotal/3600,1) >= 0.5:
+            self.cumplimientoReal = 0.5    
+            
         else:
             self.cumplimientoReal = 0.0
         

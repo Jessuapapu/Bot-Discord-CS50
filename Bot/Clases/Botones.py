@@ -43,10 +43,13 @@ class botonesEntrarOffices(botonBase):
         self.boton.callback = self.callBack
 
     async def callBack(self, interaction: discord.Interaction):
-        if str(interaction.user.display_name[10:]) == self.miembro:
+        print(interaction.user.name)
+        if str(interaction.user.name) == str(self.miembro.name):
+            
             NuevoEstu = util.Estudiante(self.miembro, self.IdOffices)
             Estado.OfficesLista[self.IdOffices].Usuarios.append(NuevoEstu)
-            tarea = asyncio.create_task(NuevoEstu.calcularCumplimieto())
+            Estado.OfficesLista[self.IdOffices].ListaDeVotos[NuevoEstu.IdUsuario] = 0
+            tarea = asyncio.create_task(NuevoEstu.CalcularTiempo())
             Estado.ContadoresActivos[NuevoEstu.IdUsuario] = (NuevoEstu, tarea)
             await interaction.response.send_message("Has sido añadido a la oficina correctamente.", ephemeral=True)
         else:
