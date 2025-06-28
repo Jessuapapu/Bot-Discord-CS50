@@ -43,7 +43,6 @@ class botonesEntrarOffices(botonBase):
         self.boton.callback = self.callBack
 
     async def callBack(self, interaction: discord.Interaction):
-        print(interaction.user.name)
         if str(interaction.user.name) == str(self.miembro.name) and str(self.miembro.display_name[10:]) not in list(Estado.ContadoresActivos.keys()):
             
             NuevoEstu = util.Estudiante(self.miembro, self.IdOffices)

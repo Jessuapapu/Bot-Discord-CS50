@@ -54,7 +54,7 @@ async def guardar(interaction: discord.Interaction, ID):
         await interaction.response.send_message.send("Error al generar el PDF.")
         return
 
-    headerTabla = ["Nombre", "Grupo", "Cumplimiento", "votos"]
+    headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
     
     mensajeEmbebido = ""

@@ -16,8 +16,8 @@ class formularioEditarEstu(discord.ui.Modal):
     
     def IniciarInput(self):
         Input = discord.ui.TextInput(
-            label=f"{self.Estudiante.IdUsuario} con cumplimiento de {self.Estudiante.cumplimientoReal}",
-            placeholder=f"{self.Estudiante.cumplimientoReal}",
+            label=f"Cumplimiento {self.Estudiante.cumplimientoReal}",
+            placeholder="Rango aceptado: 0.0 - 2.0",
             default=f"{self.Estudiante.cumplimientoReal}"
         )
         return Input
@@ -25,16 +25,20 @@ class formularioEditarEstu(discord.ui.Modal):
     
     async def on_submit(self, interaction):
         anterior = Estado.OfficesRevision[self.IDOffices].Usuarios[self.IndiceEstudiante].cumplimientoReal
+        
+        if self.Input.value not in ["0.0","0.5","1.0","1.5","2.0"]:
+            await interaction.response.send_message("Ingrese una hora valida (0.0, 0.5, 1.0, 1.5, 2.0)")
+            return
+        
         try:
-            Inputnumero = float(self.Input.value)
-            
+            Inputnumero = float(self.Input.value)    
         except:
-            await interaction.response.send_message("Error al tratar de obtener los datos nuevos", ephemeral=True)
+            await interaction.response.send_message("Error al tratar de obtener los datos nuevos, formato equivocado", ephemeral=True)
             return
         
         
         if Estado.OfficesRevision[self.IDOffices].Usuarios[self.IndiceEstudiante].cumplimientoReal == Inputnumero:
-            await interaction.response.send_message("Datos obtenidos del estudiante iguales a los originales", ephemeral=True)
+            await interaction.response.send_message("Datos obtenidos del estudiante iguales a los originales o sobre exceden el tiempo permitido", ephemeral=True)
             return
         
         Estado.OfficesRevision[self.IDOffices].Usuarios[self.IndiceEstudiante].cumplimientoReal = Inputnumero
