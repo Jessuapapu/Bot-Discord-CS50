@@ -81,6 +81,7 @@ class Estudiante:
             while True:
                 await asyncio.sleep(1)
                 self.TiempoTotal += 1
+                print(f"{self.IdOffice}: {self.TiempoTotal}")
         except asyncio.CancelledError:
             pass
     
