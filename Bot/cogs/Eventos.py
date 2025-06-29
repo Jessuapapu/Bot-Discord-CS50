@@ -66,8 +66,8 @@ class Eventos(commands.Cog):
         user_id = str(member.display_name[10:])
         AutorRoles = [rol.name for rol in member.roles] 
         
-        if any(rol in ["Staff", "Admin Staff"] for rol in AutorRoles):
-            return
+        #if any(rol in ["Staff", "Admin Staff"] for rol in AutorRoles):
+         #   return
         
         # SALIDA DEL CANAL DE VOZ
         if before.channel and (after.channel is None or before.channel != after.channel):
