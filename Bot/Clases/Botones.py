@@ -43,6 +43,8 @@ class botonesEntrarOffices(botonBase):
         self.boton.callback = self.callBack
 
     async def callBack(self, interaction: discord.Interaction):
+        await asyncio.sleep(3)
+        
         if str(interaction.user.name) == str(self.miembro.name) and str(self.miembro.display_name[10:]) not in list(Estado.ContadoresActivos.keys()):
             
             NuevoEstu = util.Estudiante(self.miembro, self.IdOffices)
@@ -52,7 +54,7 @@ class botonesEntrarOffices(botonBase):
             Estado.ContadoresActivos[NuevoEstu.IdUsuario] = (NuevoEstu, tarea)
             await interaction.response.send_message("Has sido añadido a la oficina correctamente.", ephemeral=True)
         else:
-            await interaction.response.send_message("No puedes usar este botón.", ephemeral=True)
+            await interaction.response.send_message("Ya estas registrado en la Offices :)", ephemeral=True)
 
     
 

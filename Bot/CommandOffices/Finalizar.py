@@ -30,7 +30,6 @@ async def finalizar(interaction: discord.Interaction, ID):
             
     await interaction.response.send_message(embed=embed)
 
-
     # Establecemos el Estado = 0 para finalizarla
     Office = Estado.OfficesLista[ID]
     Office.Estado = 0
@@ -39,7 +38,6 @@ async def finalizar(interaction: discord.Interaction, ID):
     
 
     for key in keys:
-        Estudiante, tarea = Estado.ContadoresActivos[key]
-        Estado.ContadoresActivos.pop(Estudiante.IdUsuario)
+        Estado.ContadoresActivos.pop(key)
         
     return

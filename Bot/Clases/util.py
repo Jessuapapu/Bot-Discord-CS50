@@ -52,6 +52,7 @@ class Estudiante:
         self.TiempoTotal = 0
         self.cumplimientoReal = 0
         
+        
 
     def calcularCumplimieto(self):
         # Valida si ha estado al menos 30 minutos en la offices
@@ -65,16 +66,18 @@ class Estudiante:
             self.cumplimientoReal = 1
             
         elif round(self.TiempoTotal/3600,1) >= 0.5:
-            self.cumplimientoReal = 0.5    
-            
+            self.cumplimientoReal = 0.5
+                 
         else:
             self.cumplimientoReal = 0.0
-        
+            
         return
     
     async def DetenerContador(self, Funcion):
         Funcion.cancel()
         self.calcularCumplimieto()
+        return Funcion
+    
     
     async def CalcularTiempo(self):
         try:
