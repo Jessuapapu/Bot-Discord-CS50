@@ -10,7 +10,7 @@ async def empezar(interaction: discord.Interaction, ID, CanalDeVoz: discord.Voic
 
     miembros = [
         util.Estudiante(miembro, ID) for miembro in CanalDeVoz.members
-        if not any(rol.name in ["Staff", "Admin Discord"] for rol in miembro.roles)
+        #if not any(rol.name in ["Staff", "Admin Discord"] for rol in miembro.roles)
     ]
 
     if len(miembros) == 0:
