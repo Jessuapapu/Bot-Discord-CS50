@@ -33,11 +33,12 @@ async def finalizar(interaction: discord.Interaction, ID):
     # Establecemos el Estado = 0 para finalizarla
     Office = Estado.OfficesLista[ID]
     Office.Estado = 0
-    Estado.OfficesLista.pop(ID)
+    
+    del Estado.OfficesLista[ID]
     Estado.OfficesRevision[ID] = Office 
     
 
     for key in keys:
-        Estado.ContadoresActivos.pop(key)
+        del Estado.ContadoresActivos[key]
         
     return
