@@ -74,7 +74,7 @@ class Eventos(commands.Cog):
             if before.channel.id in Estado.CanalesDeVoz and user_id in Estado.ContadoresActivos:
                 estudiante, tarea = Estado.ContadoresActivos[user_id]
                 await estudiante.DetenerContador(tarea)
-                #Estado.ContadoresActivos[user_id] = (estudiante, tarea)
+                Estado.ContadoresActivos[user_id] = (estudiante, tarea)
 
         # ENTRADA A CANAL DE VOZ
         elif after.channel and after.channel.id in Estado.CanalesDeVoz:
