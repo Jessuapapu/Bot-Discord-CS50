@@ -15,7 +15,6 @@ from xhtml2pdf import pisa
 
 from Clases import util
 
-
 async def guardar(interaction: discord.Interaction, ID):
 
     Contents = Estado.OfficesRevision[ID]

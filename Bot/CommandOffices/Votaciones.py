@@ -21,7 +21,8 @@ async def votacion(interaction:discord.Interaction,ID,tiempo):
    """
    
    botones = [Botones.botonesAsistencia("Estoy Presente!",discord.ButtonStyle.success,ID)]
-   
+   offices = Estado.OfficesLista[ID]
+   offices.iniciarContadorDeVotos()
    view = util.CrearEncuestaSimple(botones,tiempo)
    embed = util.CrearMensajeEmbed("Confirmaciones de Asistencia","Votaciones de control \n ¿Estas aun aqui?")
    

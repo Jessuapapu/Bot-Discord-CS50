@@ -1,7 +1,6 @@
 import discord
 from Declaraciones import Declaraciones
 from Clases import util
-import asyncio
 
 Estado = Declaraciones.EstadoGlobal()
 
@@ -26,13 +25,15 @@ class botonesAsistencia(botonBase):
         usuario = interaction_button.user.display_name[10:]
         
         # Valida si el usuario está en la lista de estudiantes de la office
-        if usuario in self.Offices.getEstudiantes():
+        print(self.Offices.getNombreEstudiantes() and self.Offices.ControlDeVotos == 0,f"{self.Offices.getNombreEstudiantes()} and {self.Offices.ControlDeVotos}")
+        if usuario in self.Offices.getNombreEstudiantes() and self.Offices.ControlDeVotos[usuario] == 0:
             self.Offices.ListaDeVotos[usuario] += 1
+            self.Offices.ControlDeVotos[usuario] += 1
             Estado.OfficesLista[self.Offices.Id] = self.Offices
 
             await interaction_button.response.send_message("✅ Tu voto ha sido registrado.", ephemeral=True)
         else:
-            await interaction_button.response.send_message("⚠ No estás registrado en esta Office.", ephemeral=True)
+            await interaction_button.response.send_message("⚠ No estás registrado en esta Office o ya marcaste en la votacion", ephemeral=True)
             
 
 class botonesEntrarOffices(botonBase):
@@ -43,14 +44,14 @@ class botonesEntrarOffices(botonBase):
         self.boton.callback = self.callBack
 
     async def callBack(self, interaction: discord.Interaction):
-        if str(interaction.user.name) == str(self.miembro.name) and str(self.miembro.display_name[10:]) not in list(Estado.ContadoresActivos.keys()):
+        
+        if str(interaction.user.name) == str(self.miembro.name):
             
             NuevoEstu = util.Estudiante(self.miembro, self.IdOffices)
             Estado.OfficesLista[self.IdOffices].Usuarios.append(NuevoEstu)
             Estado.OfficesLista[self.IdOffices].ListaDeVotos[NuevoEstu.IdUsuario] = 0
-            tarea = asyncio.create_task(NuevoEstu.CalcularTiempo())
-            Estado.ContadoresActivos[NuevoEstu.IdUsuario] = (NuevoEstu, tarea)
-            await interaction.response.send_message("Has sido añadido a la oficina correctamente.", ephemeral=True)
+            await NuevoEstu.iniciarContador()
+            await interaction.response.send_message("Has sido añadido a la oficina correctamente.")
         else:
             await interaction.response.send_message("No puedes usar este botón.", ephemeral=True)
 

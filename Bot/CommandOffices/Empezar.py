@@ -1,6 +1,5 @@
 
 import discord
-import asyncio
 from Declaraciones import Declaraciones
 
 from Clases import util
@@ -18,11 +17,10 @@ async def empezar(interaction: discord.Interaction, ID, CanalDeVoz: discord.Voic
         return
     
     for miembro in miembros:
-        tarea = asyncio.create_task(miembro.CalcularTiempo())
-        Estado.ContadoresActivos[miembro.IdUsuario] = (miembro, tarea)
+        await miembro.iniciarContador()
 
     Office = util.Offices(ID, interaction.user.display_name[8:], miembros, Bloque, CanalDeVoz)
-    Estado.CanalesDeVoz.append(CanalDeVoz.id)
+    Estado.CanalesDeVoz[CanalDeVoz.id] = ID
     Estado.OfficesLista[ID] = Office
     
     await interaction.response.send_message("Offices Inicializada")

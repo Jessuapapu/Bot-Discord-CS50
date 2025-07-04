@@ -27,7 +27,7 @@ class formularioEditarEstu(discord.ui.Modal):
         anterior = Estado.OfficesRevision[self.IDOffices].Usuarios[self.IndiceEstudiante].cumplimientoReal
         
         if self.Input.value not in ["0.0","0.5","1.0","1.5","2.0"]:
-            await interaction.response.send_message("Ingrese una hora valida (0.0, 0.5, 1.0, 1.5, 2.0)")
+            await interaction.response.send_message("Ingrese una hora valida (0.0, 0.5, 1.0, 1.5, 2.0)",ephemeral=True)
             return
         
         try:
@@ -58,7 +58,7 @@ class formularioEditarOffices(discord.ui.Modal):
         except:
             self.Offices = Estado.OfficesRevision[self.IDOffices]
             
-        self.InputIdOffices = self.IniciarInput(f"Id de offices: {self.IDOffices}", f"{self.IDOffices}", f"{self.IDOffices}")
+        self.InputIdOffices = self.IniciarInput(f"Offices: {self.IDOffices}", f"{self.IDOffices}", f"{self.IDOffices}")
         self.InputBloque = self.IniciarInput(f"Bloque de la offices : {self.Offices.bloque}", f"formato aceptado 10-12, 1-3, 3-5", f"{self.Offices.bloque}")
         
         self.add_item(self.InputIdOffices)
@@ -75,12 +75,12 @@ class formularioEditarOffices(discord.ui.Modal):
     async def on_submit(self, interaction):
         
         if self.InputIdOffices.value not in ["10-12","1-3","3-5","10 - 12","1 - 3","3 - 5"]:
-            await interaction.response.send_message("Error en el formato de las Horas")
+            await interaction.response.send_message("Error en el formato de las Horas",ephemeral=True)
             return
         
         
-        if self.InputBloque.value in list(Estado.OfficesLista.keys()) + list(Estado.OfficesRevision.keys()) and not self.IDOffices:
-            await interaction.response.send_message("Ya existe una offices con ese nombre")
+        if self.InputBloque.value in Estado.getKeyOfficesLista() + Estado.getKeyCanalesDeVoz() and not self.IDOffices:
+            await interaction.response.send_message("Ya existe una offices con ese nombre",ephemeral=True)
         
         
         Offices = None
@@ -137,7 +137,7 @@ class formularioAgregarEstudiante(discord.ui.Modal):
             return
         
         
-        if self.InputBloque.value in list(Estado.OfficesLista.keys()) + list(Estado.OfficesRevision.keys()) and not self.IDOffices:
+        if self.InputBloque.value in Estado.getKeyOfficesLista() + Estado.getKeyOfficesRevision() and not self.IDOffices:
             await interaction.response.send_message("Ya existe una offices con ese nombre")
         
         

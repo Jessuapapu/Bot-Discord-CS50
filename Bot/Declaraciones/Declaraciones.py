@@ -11,7 +11,14 @@ class EstadoGlobal:
 
     def _inicializar(self):
         self.OfficesLista = {}      # { str(Id): Offices  }
-        self.CanalesDeVoz = []      # Canales de voz monitoreados
-        self.ContadoresActivos = {} # { str(user.id): (Estudiante, tarea) }
+        self.CanalesDeVoz = {}      # { str(Canal): IdOffices }
         self.OfficesRevision = {}   # { str(Id): Offices  }
         
+    def getKeyCanalesDeVoz(self):
+        return list(self.CanalesDeVoz.keys())
+    
+    def getKeyOfficesLista(self):
+        return list(self.OfficesLista.keys())
+    
+    def getKeyOfficesRevision(self):
+        return list(self.OfficesRevision.keys())

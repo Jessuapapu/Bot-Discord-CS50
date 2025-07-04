@@ -18,7 +18,7 @@ def valida_id_office():
                 id_office = args[0]
                 args = args[1:]  # Remueve 'id' de args
 
-            if id_office not in list(Estado.OfficesLista.keys()) + list(Estado.OfficesRevision.keys()):
+            if id_office not in Estado.getKeyOfficesLista() + Estado.getKeyOfficesRevision():
                 await interaction.response.send_message("❌ La office indicada no existe.", ephemeral=True)
                 return
 

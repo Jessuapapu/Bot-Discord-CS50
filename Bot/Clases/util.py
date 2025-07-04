@@ -25,6 +25,7 @@ class Offices:
         # Es la lista de estudiantes activos
         self.Usuarios = Usuarios
         self.ListaDeVotos = self.generarListaDevotos() # IdUsuario: (cantidad de votos)
+        self.ControlDeVotos = {}
         
         # Se refiere al estado, 1: Activa, 0: Finalizada
         self.Estado = 1
@@ -38,43 +39,102 @@ class Offices:
             
     def getEstudiantes(self):
         return [user.IdUsuario for user in self.Usuarios]
-            
+    
+    def getNombreEstudiantes(self):
+        return [user.IdUsuario for user in self.Usuarios]
+    
+    def getUnicoEstudiante(self,IdUsuario):
+        # si no lo encuentra retorna None
+        for user in self.Usuarios:
+            if IdUsuario == user.IdUsuario:
+                return user
+       
+        return None   
+    
+    def iniciarContadorDeVotos(self):
+        if len(list(self.ControlDeVotos.keys())) == 0:
+            for nombre in self.getNombreEstudiantes():
+                self.ControlDeVotos[nombre] = 0
+            return
         
+        else:
+            for nombre in list(self.ControlDeVotos.keys()):
+                del self.ControlDeVotos[nombre]
+            self.iniciarContadorDeVotos()
+    
+    async def Barrido50(self):
+        
+        try:
+            while True:
+                unique_names = []
+                for user in self.Usuarios:
+                    if user not in unique_names:
+                        unique_names.append(user)
 
+                self.Usuarios = unique_names
+                await asyncio.sleep(900)
+        except asyncio.CancelledError:
+                pass
+
+           
+           
 class Estudiante:
     def __init__(self, Usuario, IdOffices):
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su nombre
         self.IdUsuario = Usuario.display_name[10:]
         self.Usuario = Usuario
+        
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su grupo
         self.grupo = Usuario.display_name[:7]
         self.IdOffice = IdOffices
         self.TiempoTotal = 0
         self.cumplimientoReal = 0
         
+        # Validar contador y no se hagan 2 o mas
+        self.Contador = None
 
     def calcularCumplimieto(self):
         # Valida si ha estado al menos 30 minutos en la offices
-        if round(self.TiempoTotal/3600,1) >= 2:
+        if round(self.TiempoTotal/3600,1) >= 1.9:
             self.cumplimientoReal = 2.0
         
-        elif round(self.TiempoTotal/3600,1) >= 1.5:
+        elif round(self.TiempoTotal/3600,1) >= 1.3:
             self.cumplimientoReal = 1.5
         
         elif round(self.TiempoTotal/3600,1) >= 1:
             self.cumplimientoReal = 1
             
-        elif round(self.TiempoTotal/3600,1) >= 0.5:
-            self.cumplimientoReal = 0.5    
-            
+        elif round(self.TiempoTotal/3600,1) >= 0.3:
+            self.cumplimientoReal = 0.5
+                 
         else:
             self.cumplimientoReal = 0.0
         
         return
     
-    async def DetenerContador(self, Funcion):
-        Funcion.cancel()
+    async def DetenerContador(self):
+        if self.Contador and not self.Contador.done():
+            self.Contador.cancel()
+            try:
+                await self.Contador
+            except asyncio.CancelledError:
+                pass
         self.calcularCumplimieto()
+    
+    
+    async def iniciarContador(self):
+        # Si ya hay un contador activo, cancelarlo y esperarlo
+        if self.Contador is not None:
+            if not self.Contador.done():
+                self.Contador.cancel()
+            try:
+                await self.Contador
+            except asyncio.CancelledError:
+                pass
+
+        # Crear uno nuevo y asignarlo
+        self.Contador = asyncio.create_task(self.CalcularTiempo())
+
     
     async def CalcularTiempo(self):
         try:

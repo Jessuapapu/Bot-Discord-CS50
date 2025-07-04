@@ -30,6 +30,7 @@ async def ListaOffices(interaction:discord.Interaction):
     await interaction.response.send_message(embed=embed)
     
     
+    
 async def ListaEstudiantes(interaction:discord.Interaction, ID):
     listaEstu = []
     try:
@@ -43,6 +44,7 @@ async def ListaEstudiantes(interaction:discord.Interaction, ID):
         
     headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
+    
     for Estudiante in listaEstu.Usuarios:
         contenidoTabla.append([Estudiante.IdUsuario, Estudiante.grupo, Estudiante.TiempoTotal, listaEstu.ListaDeVotos[Estudiante.IdUsuario]]) 
         

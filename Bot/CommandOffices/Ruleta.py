@@ -1,8 +1,6 @@
 import discord
-from Clases import util
 from Declaraciones import Declaraciones
-from PIL import Image, ImageDraw, ImageFont
-import random, os
+import random
 
 Estado = Declaraciones.EstadoGlobal()
 
