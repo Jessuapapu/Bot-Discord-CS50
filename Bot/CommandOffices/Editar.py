@@ -42,7 +42,7 @@ async def EditarOffices(interaction: discord.Interaction, IDOffices):
         ListaOffices.append(Estado.OfficesRevision[oh])
     
     
-    headers = ["ID", "Creador", "Hora", "Bloque", "Estado"]
+    headers = ["ID", "Creador", "Bloque", "Estado"]
     contenido = []
     
     for offices in ListaOffices:

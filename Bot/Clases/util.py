@@ -28,7 +28,7 @@ def CrearMensajeEmbed(Titulo = "", descripcion = "", color = discord.Color.blue(
             )
     return ListaEmbebida
         
-def CrearTabla(headers: list, Body: list, Colum_width = list):
+def CrearTabla(headers: list, Body: list, Colum_width: list):
     # In your command:
     output = t2a(
         header=headers,
