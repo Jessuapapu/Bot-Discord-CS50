@@ -5,7 +5,7 @@ from typing import Optional
 
 from Clases import util
 from Clases.Decoradores import valida_id_office, valida_roles 
-from CommandOffices import Empezar, Finalizar, Guardar, Votaciones, Ruleta, Editar, Listar, Mover, Agregar
+from CommandOffices import Empezar, Finalizar, Guardar, Votaciones, Ruleta, Editar, Listar, Mover, agregar
 from CommandPdf import Obtener, Eliminar
 
 
@@ -145,7 +145,7 @@ class Offices(commands.Cog):
     @valida_roles()
     @valida_id_office()
     async def agregar(self,interaction: discord.Interaction, id: str, estudiante: discord.Member):
-        await Agregar.agregarEstuOffices(interaction,id,estudiante)
+        await agregar.agregarEstuOffices(interaction,id,estudiante)
                 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Offices(bot))
