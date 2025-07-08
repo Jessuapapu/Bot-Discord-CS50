@@ -54,7 +54,7 @@ async def EditarOffices(interaction: discord.Interaction, IDOffices):
             
         contenido.append([offices.Id, offices.IdUsuario, offices.HoraCreacion, offices.bloque,estado])
     
-    tabla = util.CrearTabla(headers,contenido)
+    tabla = util.CrearTabla(headers,contenido,[25,9,9,7])
     embed = util.CrearMensajeEmbed("Offices Listadas", f"```\n{tabla}\n```" ,discord.Color.dark_magenta())
     
     view = SelectMenus.SelectOfficesView(IDOffices)
