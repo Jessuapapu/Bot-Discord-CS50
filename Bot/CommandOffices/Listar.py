@@ -25,7 +25,7 @@ async def ListaOffices(interaction:discord.Interaction):
             
         contenido.append([offices.Id, offices.IdUsuario, offices.HoraCreacion,estado])
     
-    tabla = util.CrearTabla(headers,contenido,[23,10,8,8])
+    tabla = util.CrearTabla(headers,contenido,[23,15,8,8])
     embed = util.CrearMensajeEmbed("Offices Listadas", f"```\n{tabla}\n```" ,discord.Color.dark_magenta())
     await interaction.response.send_message(embed=embed)
     

@@ -25,7 +25,6 @@ class botonesAsistencia(botonBase):
         usuario = interaction_button.user.display_name[10:]
         
         # Valida si el usuario está en la lista de estudiantes de la office
-        print(self.Offices.getNombreEstudiantes() and self.Offices.ControlDeVotos == 0,f"{self.Offices.getNombreEstudiantes()} and {self.Offices.ControlDeVotos}")
         if usuario in self.Offices.getNombreEstudiantes() and self.Offices.ControlDeVotos[usuario] == 0:
             self.Offices.ListaDeVotos[usuario] += 1
             self.Offices.ControlDeVotos[usuario] += 1

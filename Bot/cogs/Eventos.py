@@ -86,7 +86,7 @@ class Eventos(commands.Cog):
             else:
                 # NO está registrado, enviar botón de confirmación):
                 Offices = Estado.OfficesLista[Estado.CanalesDeVoz[after.channel.id]]
-                view = util.CrearEncuestaSimple([Botones.botonesEntrarOffices("Entrar a offices!!!!", discord.ButtonStyle.green, Offices.Id, member)],(60 * 5))
+                view = util.CrearEncuestaSimple([Botones.botonesEntrarOffices("Entrar a offices!!!!", discord.ButtonStyle.green, Offices.Id, member)], (10 * 60))
                 try:
                     await member.send(
                         f"Hola {user_id}, ¿deseas unirte a la offices?",
