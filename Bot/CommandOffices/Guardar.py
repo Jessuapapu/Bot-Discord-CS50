@@ -56,11 +56,10 @@ async def guardar(interaction: discord.Interaction, ID):
     headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
     
-    mensajeEmbebido = ""
     for Estu in Contents.Usuarios:
         contenidoTabla.append([Estu.IdUsuario, Estu.grupo, Estu.cumplimientoReal, Estado.OfficesRevision[ID].ListaDeVotos[Estu.IdUsuario]])  
     
-    tabla = util.CrearTabla(headerTabla,contenidoTabla)
+    tabla = util.CrearTabla(headerTabla,contenidoTabla,[20,9,9,7])
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
 
     del Estado.OfficesRevision[ID]

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -15,7 +15,7 @@
         }
 
         table.header td {
-            vertical-align: middle;
+            vertical-align: top;
         }
 
         .info-texto {
@@ -25,59 +25,51 @@
 
         .logo-container img {
             height: 45px;
-            width: auto; /* evita estiramiento horizontal */
+            width: auto;
             display: block;
+        }
+
+
+        .staff-line {
+            border-bottom: 0.5px solid #aaa;
+            margin: 2px 0;
+            height: 11px;
         }
 
         table.data-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
             margin-top: 10px;
             font-size: 9px;
-            table-layout: fixed;
-        }
-
-        thead {
-            background-color: #e0e0e0;
         }
 
         th, td {
             border: 0.5px solid #666;
             padding: 3px 5px;
-            text-align: left;
+            text-align: center;
+            vertical-align: middle;
             word-wrap: break-word;
         }
 
-        th {
-            font-weight: bold;
-            color: #333;
+        th.col-num, td.col-num {
+            width: 30px;
         }
 
-        th:nth-child(1),
-        td:nth-child(1) {
-            width: 45%;
+        th.col-nombre, td.col-nombre {
+            width: 50%;
         }
 
-        th:nth-child(2),
-        td:nth-child(2) {
-            width: 30%;
+        th.col-grupo, td.col-grupo {
+            width: 20%;
         }
 
-        th:nth-child(3),
-        td:nth-child(3) {
-            width: 25%;
+        th.col-cumpl, td.col-cumpl {
+            width: 27%;
         }
 
         tbody tr:nth-child(even) {
             background-color: #f7f7f7;
-        }
-
-        tbody td:first-child {
-            font-weight: bold;
-        }
-
-        .center {
-            text-align: center;
         }
     </style>
 </head>
@@ -85,34 +77,46 @@
 
     <table class="header">
         <tr>
+            <!-- Logo -->
             <td class="logo-container">
                 <img src="{{ logo }}">
             </td>
+
+            <!-- Caja staff -->
+            <td>
+                    <p style="font-size: 10px;">STAFF</p>
+                    <div class="staff-line"></div>
+                    <div class="staff-line"></div>
+                    <div class="staff-line"></div>
+                    <div class="staff-line"></div>
+            </td>
+
+            <!-- Info -->
             <td class="info-texto">
                 <p><strong>Fecha:</strong> {{ Fecha }}</p>
                 <p><strong>Bloque:</strong> {{ Bloque }}</p>
-                <p><strong>Número de Offices:</strong> {{ Offices }}</p>
+                <p><strong>ID de Offices:</strong> {{ Offices }}</p>
             </td>
         </tr>
     </table>
     
     <table class="data-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Grupo</th>
-                <th class="center">Cumplimiento (horas)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for Estudiante in Estudiantes %}
-            <tr>
-                <td>{{ Estudiante.IdUsuario }}</td>
-                <td>{{ Estudiante.grupo }}</td>
-                <td class="center">{{ Estudiante.cumplimientoReal }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+        <tr>
+            <th class="col-num" style="background-color: #8B0000; color: white;">#</th>
+            <th class="col-nombre" style="background-color: #8B0000; color: white;">Nombre</th>
+            <th class="col-grupo" style="background-color: #8B0000; color: white;">Grupo</th>
+            <th class="col-cumpl" style="background-color: #8B0000; color: white;">Cumplimiento (horas)</th>
+        </tr>
+        {% set ns = namespace(c = 1) %}
+        {% for Estudiante in Estudiantes %}
+        <tr>
+            <td class="col-num">{{ ns.c }}</td>
+            <td class="col-nombre">{{ Estudiante.IdUsuario }}</td>
+            <td class="col-grupo">{{ Estudiante.grupo }}</td>
+            <td class="col-cumpl">{{ Estudiante.cumplimientoReal }}</td>
+        </tr>
+        {% set ns.c = ns.c + 1 %}
+        {% endfor %}
     </table>
 
 </body>

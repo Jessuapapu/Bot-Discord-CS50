@@ -1,6 +1,6 @@
 import discord
 from Declaraciones import Declaraciones
-from Clases import util
+from Clases import EstudianteClass
 
 Estado = Declaraciones.EstadoGlobal()
 
@@ -47,7 +47,7 @@ class botonesEntrarOffices(botonBase):
         
         if str(interaction.user.name) == str(self.miembro.name):
             
-            NuevoEstu = util.Estudiante(self.miembro, self.IdOffices)
+            NuevoEstu = EstudianteClass.Estudiante(self.miembro, self.IdOffices)
             Estado.OfficesLista[self.IdOffices].Usuarios.append(NuevoEstu)
             Estado.OfficesLista[self.IdOffices].ListaDeVotos[NuevoEstu.IdUsuario] = 0
             await NuevoEstu.iniciarContador()

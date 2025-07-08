@@ -1,32 +1,15 @@
 import discord
 from Declaraciones import Declaraciones
-from Clases import util, SelectMenus
+from Clases import Formulario
 
 Estado = Declaraciones.EstadoGlobal()
 
-async def agregarEstuOffices(interaction: discord.Interaction, IDOffices):
-    ListaOffices = []
+async def agregarEstuOffices(interaction: discord.Interaction, IDOffices, Estudiante: discord.Member):
+    RolesEstudiante = [rol.name for rol in Estudiante.roles]
+    if any(rol in ["Staff", "Admin Staff"] for rol in RolesEstudiante):
+        await interaction.response.send_message("No se puede agregar a un staff a una offices")
+        return
     
-    for oh in Estado.OfficesLista:
-        ListaOffices.append(Estado.OfficesLista[oh])
-    for oh in Estado.OfficesRevision:
-        ListaOffices.append(Estado.OfficesRevision[oh])
+    formulario = Formulario.formularioAgregarEstudiante("Agregar a un Estudiante", IDOffices,Estudiante)
+    await interaction.response.send_modal(formulario)
     
-    
-    headers = ["ID", "Creador", "Hora", "Bloque", "Estado"]
-    contenido = []
-    
-    for offices in ListaOffices:
-        estado = ''
-        if offices.Estado == 1:
-            estado = "Activa"
-        else:
-            estado = "Revision"
-            
-        contenido.append([offices.Id, offices.IdUsuario, offices.HoraCreacion, offices.bloque,estado])
-    
-    tabla = util.CrearTabla(headers,contenido)
-    embed = util.CrearMensajeEmbed("Offices Listadas", f"```\n{tabla}\n```" ,discord.Color.dark_magenta())
-    
-    view = SelectMenus.SelectOfficesView(IDOffices)
-    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)

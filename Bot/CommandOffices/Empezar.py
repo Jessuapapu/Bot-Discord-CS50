@@ -2,14 +2,14 @@
 import discord
 from Declaraciones import Declaraciones
 
-from Clases import util
+from Clases import OfficeClass, EstudianteClass
 Estado = Declaraciones.EstadoGlobal()
 
 async def empezar(interaction: discord.Interaction, ID, CanalDeVoz: discord.VoiceChannel, Bloque):
 
     miembros = [
-        util.Estudiante(miembro, ID) for miembro in CanalDeVoz.members
-        if not any(rol.name in ["Staff", "Admin Discord"] for rol in miembro.roles)
+        EstudianteClass.Estudiante(miembro, ID) for miembro in CanalDeVoz.members
+        #if not any(rol.name in ["Staff", "Admin Discord"] for rol in miembro.roles)
     ]
 
     if len(miembros) == 0:
@@ -19,9 +19,10 @@ async def empezar(interaction: discord.Interaction, ID, CanalDeVoz: discord.Voic
     for miembro in miembros:
         await miembro.iniciarContador()
 
-    Office = util.Offices(ID, interaction.user.display_name[8:], miembros, Bloque, CanalDeVoz)
+    Office = OfficeClass.Offices(ID, interaction.user.display_name[8:], miembros, Bloque, CanalDeVoz)
     Estado.CanalesDeVoz[CanalDeVoz.id] = ID
     Estado.OfficesLista[ID] = Office
+    await Office.Barrido50()
     
     await interaction.response.send_message("Offices Inicializada")
     return

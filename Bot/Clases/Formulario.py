@@ -1,61 +1,88 @@
 import discord
-from Clases import util
+from Clases import EstudianteClass
 from Declaraciones import Declaraciones
 Estado = Declaraciones.EstadoGlobal()
 
 class formularioEditarEstu(discord.ui.Modal):
 
-    def __init__(self, title, IDOffices,Estudiante:util.Estudiante,IDEstu):
-        super().__init__(title=title, timeout=180)
+    def __init__(self, title, IDOffices,Estudiante: EstudianteClass.Estudiante,IDEstu):
+        super().__init__(title=title, timeout=5*60)
         self.IDOffices = IDOffices
         self.Estudiante = Estudiante
         self.IndiceEstudiante = IDEstu
-        self.Input = self.IniciarInput()
-        self.add_item(self.Input) 
+        self.Offices = None
+        
+        # Tiene que entrar en uno
+        if self.IDOffices in Estado.getKeyOfficesLista():
+            self.Offices = Estado.OfficesLista[self.IDOffices]
+        else:
+            self.Offices = Estado.OfficesRevision[self.IDOffices]
+        
+        self.InputNombreEstudiante = self.IniciarInput("Nombre del estudiante", f"{self.Estudiante.IdUsuario}", self.Estudiante.IdUsuario)
+        self.InputGrupoEstudiante = self.IniciarInput("Grupo del estudiante (Solo la letra)", f"{self.Estudiante.grupo[7]}", self.Estudiante.grupo[7])
+        self.InputCumplimiento = self.IniciarInput(f"Cumplimiento {self.Estudiante.cumplimientoReal}","Rango aceptado: 0.0 - 2.0",{self.Estudiante.cumplimientoReal})
+        
+        self.add_item(self.InputNombreEstudiante)
+        self.add_item(self.InputGrupoEstudiante)
+        self.add_item(self.InputCumplimiento)
     
-    
-    def IniciarInput(self):
+    def IniciarInput(self, label = " ", placeholder = " ", default = " "):
         Input = discord.ui.TextInput(
-            label=f"Cumplimiento {self.Estudiante.cumplimientoReal}",
-            placeholder="Rango aceptado: 0.0 - 2.0",
-            default=f"{self.Estudiante.cumplimientoReal}"
+            label= label,
+            placeholder= placeholder, 
+            default= default,
         )
         return Input
     
     
     async def on_submit(self, interaction):
-        anterior = Estado.OfficesRevision[self.IDOffices].Usuarios[self.IndiceEstudiante].cumplimientoReal
         
-        if self.Input.value not in ["0.0","0.5","1.0","1.5","2.0"]:
+        anteriorNombre = self.Estudiante.IdUsuario
+        anteriorHora = self.Estudiante.cumplimientoReal
+        anteriorGrupo = self.Estudiante.grupo
+        
+        if self.InputCumplimiento.value not in ["0.0","0.5","1.0","1.5","2.0"]:
             await interaction.response.send_message("Ingrese una hora valida (0.0, 0.5, 1.0, 1.5, 2.0)",ephemeral=True)
             return
         
+        if self.InputGrupoEstudiante.value is None or self.InputGrupoEstudiante.value.lower() not in ["a","b","c","d","e","f","g","h","i"]:
+            await interaction.response.send_message("Ingrese solo la letra del grupo A, B, C, D, E, F, G, H, I",ephemeral=True)
+            return
+        
         try:
-            Inputnumero = float(self.Input.value)    
+            Inputnumero = float(self.InputCumplimiento.value)    
         except:
             await interaction.response.send_message("Error al tratar de obtener los datos nuevos, formato equivocado", ephemeral=True)
             return
         
         
-        if Estado.OfficesRevision[self.IDOffices].Usuarios[self.IndiceEstudiante].cumplimientoReal == Inputnumero:
-            await interaction.response.send_message("Datos obtenidos del estudiante iguales a los originales o sobre exceden el tiempo permitido", ephemeral=True)
+        if Inputnumero > 2.0:
+            await interaction.response.send_message("Sobre exceden el tiempo permitido", ephemeral=True)
             return
         
-        Estado.OfficesRevision[self.IDOffices].Usuarios[self.IndiceEstudiante].cumplimientoReal = Inputnumero
+        self.Estudiante.IdUsuario = self.InputNombreEstudiante.value
+        self.Estudiante.grupo = f"Grupo {self.InputGrupoEstudiante.value.upper()}"
+        self.Estudiante.cumplimientoReal = Inputnumero
+        self.Estudiante.TiempoTotal = Inputnumero//3600 if Inputnumero > 0.0 else 0
         
-        await interaction.response.send_message(f"Datos del estudiante {self.Estudiante.IdUsuario} han sido cambiado de {anterior} a {Inputnumero} correctamente :)", ephemeral=True)
+        if self.Offices.Estado == 0:
+            Estado.OfficesRevision[self.Offices.Id].Usuarios[self.IndiceEstudiante] = self.Estudiante
+        elif self.Offices.Estado == 1:
+            Estado.OfficesLista[self.Offices.Id].Usuarios[self.IndiceEstudiante] = self.Estudiante
+        
+        await interaction.response.send_message(f"Datos del estudiante han sido cambiado Correctamente, {anteriorNombre} -> {self.Estudiante.IdUsuario}, {anteriorHora} -> {Inputnumero}, {anteriorGrupo} -> Grupo {self.InputGrupoEstudiante} correctamente :)", ephemeral=True)
    
 
 class formularioEditarOffices(discord.ui.Modal):
     def __init__(self, title, IDOffices):
-        super().__init__(title=title, timeout=180)
+        super().__init__(title=title[:45], timeout=5*60)
         self.IDOffices = IDOffices
         self.Offices = None
         
         # Tiene que entrar en uno
-        try:
+        if self.IDOffices in Estado.getKeyOfficesLista():
             self.Offices = Estado.OfficesLista[self.IDOffices]
-        except:
+        else:
             self.Offices = Estado.OfficesRevision[self.IDOffices]
             
         self.InputIdOffices = self.IniciarInput(f"Offices: {self.IDOffices}", f"{self.IDOffices}", f"{self.IDOffices}")
@@ -82,32 +109,32 @@ class formularioEditarOffices(discord.ui.Modal):
         if self.InputBloque.value in Estado.getKeyOfficesLista() + Estado.getKeyCanalesDeVoz() and not self.IDOffices:
             await interaction.response.send_message("Ya existe una offices con ese nombre",ephemeral=True)
         
+        anteriorBloque = self.Offices.bloque
+        anteriorId = self.Offices.Id
         
-        Offices = None
         try:
-            Offices = Estado.OfficesLista[self.IDOffices]
             del Estado.OfficesLista[self.IDOffices]
         except:
-            Offices = Estado.OfficesRevision[self.IDOffices]
             del Estado.OfficesRevision[self.IDOffices]
             
             
-        Offices.Id = self.Input1.value
-        Offices.bloque = self.Input2.value
+        self.Offices.Id = self.InputIdOffices.value
+        self.Offices.bloque = self.InputBloque.value
         
-        if Offices.Estado == 0:
-            Estado.OfficesRevision[Offices.Id] = Offices
-        elif Offices.Estado == 1:
-            Estado.OfficesLista[Offices.Id] = Offices
+        if self.Offices.Estado == 0:
+            Estado.OfficesRevision[self.Offices.Id] = self.Offices
+        elif self.Offices.Estado == 1:
+            Estado.OfficesLista[self.Offices.Id] = self.Offices
         
-        await interaction.response.send_message("Offices editada Correctamente :)")
+        await interaction.response.send_message(f"Offices editada Correctamente :), {anteriorId} -> {self.InputIdOffices.value}, {anteriorBloque} -> {self.InputBloque.value}")
     
     
 class formularioAgregarEstudiante(discord.ui.Modal):
-    def __init__(self, title, IDOffices):
-        super().__init__(title=title, timeout=180)
+    def __init__(self, title, IDOffices, DiscordMiembro : discord.Member):
+        super().__init__(title=title, timeout=5*60)
         self.IDOffices = IDOffices
         self.Offices = None
+        self.DiscordMiembro = DiscordMiembro # Se trata como si fuera un estudiante, pero es solo para obtener el miembro directo del servidor
         
         # Tiene que entrar en uno
         try:
@@ -115,47 +142,70 @@ class formularioAgregarEstudiante(discord.ui.Modal):
         except:
             self.Offices = Estado.OfficesRevision[self.IDOffices]
             
-        self.InputIdOffices = self.IniciarInput(f"Id de offices: {self.IDOffices}", f"{self.IDOffices}", f"{self.IDOffices}")
+        #self.InputNombreEstudiante = self.IniciarInput("Nombre del estudiante", f"", None)
+        #self.InputGrupoEstudiante = self.IniciarInput("Grupo del estudiante (Solo la letra)", f"", None)
+        self.InputCumplimientoEstu = self.IniciarInput("Cumplimiento en Horas","Si esta activa se calcula el tiempo",0.0)
 
-        
-        
-        self.add_item(self.InputIdOffices)
-        self.add_item(self.InputBloque) 
+        #self.add_item(self.InputNombreEstudiante)
+        #self.add_item(self.InputGrupoEstudiante)
+        self.add_item(self.InputCumplimientoEstu)
+
         
     def IniciarInput(self, label = " ", placeholder = " ", default = " "):
         Input = discord.ui.TextInput(
-            label= label,
-            placeholder= placeholder, 
-            default= default,
+            label = label,
+            placeholder = placeholder, 
+            default = default,
         )
         return Input
     
     async def on_submit(self, interaction):
         
-        if self.InputIdOffices.value not in ["10-12","1-3","3-5","10 - 12","1 - 3","3 - 5"]:
-            await interaction.response.send_message("Error en el formato de las Horas")
+        if self.InputCumplimientoEstu.value not in ["0.0","0.5","1.0","1.5","2.0"] or self.InputCumplimientoEstu.value is None:
+            await interaction.response.send_message("Ingrese una hora valida (0.0, 0.5, 1.0, 1.5, 2.0)",ephemeral=True)
             return
         
+        # Innecesario, pero de una forma de colocar el nombre
+        """if self.InputNombreEstudiante is None:
+            await interaction.response.send_message("Ingrese un Nombre Valido",ephemeral=True)
+            return"""
         
-        if self.InputBloque.value in Estado.getKeyOfficesLista() + Estado.getKeyOfficesRevision() and not self.IDOffices:
-            await interaction.response.send_message("Ya existe una offices con ese nombre")
+        # Innecesario, pero es otra forma de colocar el grupo
+        """if self.InputGrupoEstudiante.value.lower() not in ["a","b","c","d","e","f","g","h","i"] or self.InputGrupoEstudiante is None:
+            await interaction.response.send_message("Ingrese solo la letra del grupo A, B, C, D, E, F, G, H, I",ephemeral=True)
+            return"""
         
-        
-        Offices = None
-        try:
-            Offices = Estado.OfficesLista[self.IDOffices]
-            del Estado.OfficesLista[self.IDOffices]
-        except:
-            Offices = Estado.OfficesRevision[self.IDOffices]
-            del Estado.OfficesRevision[self.IDOffices]
             
+        EstudianteNuevo = EstudianteClass.Estudiante(self.DiscordMiembro,self.IDOffices)
+        EstudianteNuevo.cumplimientoReal = float(self.InputCumplimientoEstu.value)
+        
+        
+        if self.Offices.Estado == 0:
+            if self.validarDuplicados(EstudianteNuevo,Estado.OfficesRevision[self.Offices.Id].Usuarios):
+                Estado.OfficesRevision[self.Offices.Id].Usuarios.append(EstudianteNuevo)
+                Estado.OfficesRevision[self.Offices.Id].ListaDeVotos[EstudianteNuevo.IdUsuario] = 0
+            else:
+                await interaction.response.send_message("Estudiante Duplicado :(")
+                return 
             
-        Offices.Id = self.Input1.value
-        Offices.bloque = self.Input2.value
+        elif self.Offices.Estado == 1:
+            if  self.validarDuplicados(EstudianteNuevo,Estado.OfficesLista[self.Offices.Id].Usuarios):
+                EstudianteNuevo.TiempoTotal = float(self.InputCumplimientoEstu.value) * 3600
+                await EstudianteNuevo.iniciarContador()
+                Estado.OfficesLista[self.Offices.Id].Usuarios.append(EstudianteNuevo)
+                Estado.OfficesLista[self.Offices.Id].ListaDeVotos[EstudianteNuevo.IdUsuario] = 0
+            else:
+                await interaction.response.send_message("Estudiante Duplicado :(")
+                return
+                
         
-        if Offices.Estado == 0:
-            Estado.OfficesRevision[Offices.Id] = Offices
-        elif Offices.Estado == 1:
-            Estado.OfficesLista[Offices.Id] = Offices
+        await interaction.response.send_message("Estudiante agregado Correctamente :)")
         
-        await interaction.response.send_message("Offices editada Correctamente :)")
+        
+    def validarDuplicados(self,Estu:EstudianteClass.Estudiante,lista):
+        for User in lista:
+            if Estu.IdDiscord == User.IdDiscord:
+                return False
+        
+        return True
+        

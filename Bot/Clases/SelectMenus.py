@@ -17,6 +17,9 @@ class SelectOfficesView(discord.ui.View):
         self.add_item(SelectOffices(IDOffices))
 
 
+#-----------------------------------------------------------------------------------------------------------
+
+
 class SelectEstudiante(discord.ui.Select):
     def __init__(self, estudiantes, IDOffices):
         self.IDOffices = IDOffices
@@ -39,7 +42,7 @@ class SelectEstudiante(discord.ui.Select):
         for i, estu in enumerate(self.estudiantes):
             if estu.IdUsuario == seleccionado:
                 modal = Formulario.formularioEditarEstu(
-                    f"Editando a {estu.IdUsuario}",
+                    f"Editando a {estu.IdUsuario[:45]}",
                     self.IDOffices,
                     estu,
                     i

@@ -20,10 +20,18 @@ class Offices:
         # Se refiere al estado, 1: Activa, 0: Finalizada
         self.Estado = 1
         
+        self._Limpieza = None
+        
+        
+        
     def generarListaDevotos(self):
         ListaDeVotos = {}
         for user in self.Usuarios:
-            ListaDeVotos[user.IdUsuario] = 0
+            try:
+                if ListaDeVotos[user.IdUsuario] > 0:
+                    ListaDeVotos[user.IdUsuario] = ListaDeVotos[user.IdUsuario]
+            except:
+                ListaDeVotos[user.IdUsuario] = 0
             
         return ListaDeVotos
             
@@ -52,16 +60,25 @@ class Offices:
                 del self.ControlDeVotos[nombre]
             self.iniciarContadorDeVotos()
     
-    async def Barrido50(self):
+    async def Barrido50(self):  
+        if self._Limpieza is not None:
+            if not self._Limpieza.done():
+                self._Limpieza.cancel()
         
+        self._Limpieza = asyncio.create_task(self.limpieza())
+            
+            
+    async def limpieza(self):
         try:
             while True:
-                unique_names = []
-                for user in self.Usuarios:
-                    if user not in unique_names:
-                        unique_names.append(user)
+                if self.Estado != 1:
+                    break
+                
+                tmp = set(self.Usuarios)
+                for User in tmp:
+                    await User.iniciarContador()
+                self.Usuarios = list(tmp)
 
-                self.Usuarios = unique_names
-                await asyncio.sleep(900)
+                await asyncio.sleep(5*60)
         except asyncio.CancelledError:
                 pass

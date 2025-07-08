@@ -19,8 +19,8 @@ async def finalizar(interaction: discord.Interaction, ID):
         #                      Nombre del estudiante      grupo                   horas                      votos
         contenidoTabla.append([Estudiante.IdUsuario, Estudiante.grupo, Estudiante.cumplimientoReal, Estado.OfficesLista[ID].ListaDeVotos[Estudiante.IdUsuario]])  
 
-    tabla = util.CrearTabla(headerTabla,contenidoTabla)
-    embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
+    tabla = util.CrearTabla(headerTabla,contenidoTabla,[20,9,8,8])
+    embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"El tiempo es total en horas\n```\n{tabla}\n```", discord.Color.dark_gold())
             
     await interaction.response.send_message(embed=embed)
 
