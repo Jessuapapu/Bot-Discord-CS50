@@ -10,13 +10,6 @@ async def finalizar(interaction: discord.Interaction, ID):
         await interaction.response.send_message("No hay offices activas o la offices no esta activa",ephemeral=True)
         return
 
-    # Establecemos el Estado = 0 para finalizarla
-    Office = Estado.OfficesLista[ID]
-    Office.Estado = 0
-    
-    del Estado.OfficesLista[ID]
-    del Estado.CanalesDeVoz[Office.canal.id]
-    Estado.OfficesRevision[ID] = Office 
     
     headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
@@ -28,6 +21,13 @@ async def finalizar(interaction: discord.Interaction, ID):
         contenidoTabla.append([Estudiante.IdUsuario, Estudiante.grupo, Estudiante.cumplimientoReal, Estado.OfficesLista[ID].ListaDeVotos[Estudiante.IdUsuario]])  
 
 
+    # Establecemos el Estado = 0 para finalizarla
+    Office = Estado.OfficesLista[ID]
+    Office.Estado = 0
+    
+    del Estado.OfficesLista[ID]
+    del Estado.CanalesDeVoz[Office.canal.id]
+    Estado.OfficesRevision[ID] = Office 
 
     tabla = util.CrearTabla(headerTabla,contenidoTabla,[25,9,9,7])
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"El tiempo es total en horas\n```\n{tabla}\n```", discord.Color.dark_gold())
