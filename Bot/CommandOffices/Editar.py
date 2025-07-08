@@ -22,7 +22,7 @@ async def EditarEstudiante(interaction: discord.Interaction, IDOffices):
             Contents.ListaDeVotos[estu.IdUsuario]
         ])
 
-    tabla = util.CrearTabla(headerTabla, contenidoTabla)
+    tabla = util.CrearTabla(headerTabla, contenidoTabla, [25,9,9,7])
     embed = util.CrearMensajeEmbed(
         "Estudiantes disponibles para editar",
         f"Selecciona uno del menú.\n```\n{tabla}\n```",
