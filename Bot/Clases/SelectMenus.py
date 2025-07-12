@@ -4,11 +4,11 @@ from Declaraciones import Declaraciones
 
 Estado = Declaraciones.EstadoGlobal()
 
-
-class SelectEstudianteView(discord.ui.View):
-    def __init__(self, estudiantes, IDOffices):
-        super().__init__(timeout=60)
-        self.add_item(SelectEstudiante(estudiantes, IDOffices))
+# Clase Refactorizada
+# class SelectEstudianteView(discord.ui.View):
+#     def __init__(self, estudiantes, IDOffices):
+#         super().__init__(timeout=60)
+#         self.add_item(SelectEstudiante(estudiantes, IDOffices))
         
         
 class SelectOfficesView(discord.ui.View):
@@ -19,36 +19,36 @@ class SelectOfficesView(discord.ui.View):
 
 #-----------------------------------------------------------------------------------------------------------
 
+# Clase Refactorizada
+# class SelectEstudiante(discord.ui.Select):
+#     def __init__(self, estudiantes, IDOffices):
+#         self.IDOffices = IDOffices
+#         self.estudiantes = estudiantes
 
-class SelectEstudiante(discord.ui.Select):
-    def __init__(self, estudiantes, IDOffices):
-        self.IDOffices = IDOffices
-        self.estudiantes = estudiantes
+#         options = [
+#             discord.SelectOption(label=estu.IdUsuario, description=f"Grupo: {estu.grupo}")
+#             for estu in estudiantes
+#         ]
 
-        options = [
-            discord.SelectOption(label=estu.IdUsuario, description=f"Grupo: {estu.grupo}")
-            for estu in estudiantes
-        ]
+#         super().__init__(
+#             placeholder="Selecciona un estudiante para editar...",
+#             min_values=1,
+#             max_values=1,
+#             options=options
+#         )
 
-        super().__init__(
-            placeholder="Selecciona un estudiante para editar...",
-            min_values=1,
-            max_values=1,
-            options=options
-        )
-
-    async def callback(self, interaction: discord.Interaction):
-        seleccionado = self.values[0]
-        for i, estu in enumerate(self.estudiantes):
-            if estu.IdUsuario == seleccionado:
-                modal = Formulario.formularioEditarEstu(
-                    f"Editando a {estu.IdUsuario[:45]}",
-                    self.IDOffices,
-                    estu,
-                    i
-                )
-                await interaction.response.send_modal(modal)
-                break
+#     async def callback(self, interaction: discord.Interaction):
+#         seleccionado = self.values[0]
+#         for i, estu in enumerate(self.estudiantes):
+#             if estu.IdUsuario == seleccionado:
+#                 modal = Formulario.formularioEditarEstu(
+#                     f"Editando a {estu.IdUsuario[:45]}",
+#                     self.IDOffices,
+#                     estu,
+#                     i
+#                 )
+#                 await interaction.response.send_modal(modal)
+#                 break
           
             
 class SelectOffices(discord.ui.Select):

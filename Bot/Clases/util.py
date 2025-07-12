@@ -1,4 +1,3 @@
-import asyncio
 import discord
 import os
 
@@ -6,21 +5,29 @@ from discord import app_commands
 from typing import List
 from Declaraciones import Declaraciones
 from table2ascii import table2ascii as t2a
+from typing import Optional
+
 Estado = Declaraciones.EstadoGlobal()
 
-# Funciones Auxiliares
-# Validacion de roles aceptados
-def VerificacionRoles(interaction):
-    RolesAceptados = ['Admin Discord','Staff']
-    # Se obtiene los roles de autor del mensaje
-    AutorRoles = [rol.name for rol in interaction.author.roles[1:]]
+""" 
 
-    if AutorRoles[len(AutorRoles) - 1] not in RolesAceptados:
-        return False
-    return True
+    Funciones Auxiliares 
+    Funciones esenciales y son una forma de refactorizar el codigo, la mas inportante son los autocomplete
 
-# Crear mensajes embed
-def CrearMensajeEmbed(Titulo = "", descripcion = "", color = discord.Color.blue()):
+"""
+# No necesario ya
+# # Validacion de roles aceptados
+# def VerificacionRoles(interaction):
+#     RolesAceptados = ['Admin Discord','Staff']
+#     # Se obtiene los roles de autor del mensaje
+#     AutorRoles = [rol.name for rol in interaction.author.roles[1:]]
+
+#     if AutorRoles[len(AutorRoles) - 1] not in RolesAceptados:
+#         return False
+#     return True
+
+def CrearMensajeEmbed(Titulo = "", descripcion = "", color = discord.Color.blue()) -> discord.Embed:
+    """ funcion encargada en crear mensajes embed """
     ListaEmbebida = discord.Embed(  
             title=Titulo,     
             description = descripcion ,
@@ -28,15 +35,28 @@ def CrearMensajeEmbed(Titulo = "", descripcion = "", color = discord.Color.blue(
             )
     return ListaEmbebida
         
-def CrearTabla(headers: list, Body: list, Colum_width: list):
+def CrearTabla(headers: list[str], Body: list[list[str]], Column_width: list[int] | None) -> str:
+    """ Funcion encargada de crear una tabla"""
     # In your command:
     output = t2a(
-        header=headers,
+        header = headers,
         body= Body,
-        first_col_heading=True,
-        column_widths=Colum_width
+        first_col_heading = True,
+        column_widths = Column_width
     )
     return output
+
+
+
+def CrearEncuestaSimple(Botones:list, tiempo) -> discord.ui.View:
+    """ Funcion encargada para generar Encuestas """
+    view = discord.ui.View(timeout = tiempo)
+    
+    for boton in Botones:
+        view.add_item(boton.boton)
+    
+    return view
+
 
 
 # Función de autocomplete
@@ -96,13 +116,3 @@ async def Pdfs_autocomplete(interaction: discord.Interaction, current: str) -> L
     ]
 
     return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
-
-
-# Generar Encuestas
-def CrearEncuestaSimple( Botones:list, tiempo):
-    view = discord.ui.View(timeout = tiempo)
-    
-    for boton in Botones:
-        view.add_item(boton.boton)
-    
-    return view

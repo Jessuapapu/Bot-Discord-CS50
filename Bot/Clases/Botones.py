@@ -52,7 +52,7 @@ class botonesEntrarOffices(botonBase):
             await NuevoEstu.iniciarContador()
             await interaction.response.send_message("Has sido añadido a la oficina correctamente.")
         else:
-            await interaction.response.send_message("No puedes usar este botón.", ephemeral=True)
+            await interaction.response.send_message("No puedes usar este botón ya expiro o ya estas en la offices", ephemeral=True)
 
     
 

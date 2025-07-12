@@ -5,22 +5,23 @@ Estado = Declaraciones.EstadoGlobal()
 
 class formularioEditarEstu(discord.ui.Modal):
 
-    def __init__(self, title, IDOffices,Estudiante: EstudianteClass.Estudiante,IDEstu):
+    def __init__(self, title : str, IDOffices : str, Estudiante: EstudianteClass.Estudiante | discord.Member | str):
         super().__init__(title=title, timeout=5*60)
         self.IDOffices = IDOffices
-        self.Estudiante = Estudiante
-        self.IndiceEstudiante = IDEstu
-        self.Offices = None
+        self.Estudiante = Estado.getEstudiante(Estudiante, IDOffices) if type(Estudiante) is not EstudianteClass.Estudiante else Estudiante
+        print(type(self.Estudiante))
+        self.Offices = Estado.getOffices(IDOffices)
         
-        # Tiene que entrar en uno
-        if self.IDOffices in Estado.getKeyOfficesLista():
-            self.Offices = Estado.OfficesLista[self.IDOffices]
-        else:
-            self.Offices = Estado.OfficesRevision[self.IDOffices]
+        # # Tiene que entrar en uno (Refactorizado)
+        # if self.IDOffices in Estado.getKeyOfficesLista():
+        #     self.Offices = Estado.OfficesLista[self.IDOffices]
+        # else:
+        #     self.Offices = Estado.OfficesRevision[self.IDOffices]
         
+        print()
         self.InputNombreEstudiante = self.IniciarInput("Nombre del estudiante", f"{self.Estudiante.IdUsuario}", self.Estudiante.IdUsuario)
-        self.InputGrupoEstudiante = self.IniciarInput("Grupo del estudiante (Solo la letra)", f"{self.Estudiante.grupo[7]}", self.Estudiante.grupo[7])
-        self.InputCumplimiento = self.IniciarInput(f"Cumplimiento {self.Estudiante.cumplimientoReal}","Rango aceptado: 0.0 - 2.0",{self.Estudiante.cumplimientoReal})
+        self.InputGrupoEstudiante = self.IniciarInput("Grupo del estudiante (Solo la letra)", f"{self.Estudiante.grupo[6]}", self.Estudiante.grupo[6])
+        self.InputCumplimiento = self.IniciarInput(f"Cumplimiento {self.Estudiante.cumplimientoReal}","Rango aceptado: 0.0 - 2.0",f"{self.Estudiante.cumplimientoReal}")
         
         self.add_item(self.InputNombreEstudiante)
         self.add_item(self.InputGrupoEstudiante)
@@ -63,12 +64,17 @@ class formularioEditarEstu(discord.ui.Modal):
         self.Estudiante.IdUsuario = self.InputNombreEstudiante.value
         self.Estudiante.grupo = f"Grupo {self.InputGrupoEstudiante.value.upper()}"
         self.Estudiante.cumplimientoReal = Inputnumero
-        self.Estudiante.TiempoTotal = Inputnumero//3600 if Inputnumero > 0.0 else 0
+        self.Estudiante.TiempoTotal = Inputnumero * 3600 if Inputnumero > 0.0 else 0
         
         if self.Offices.Estado == 0:
-            Estado.OfficesRevision[self.Offices.Id].Usuarios[self.IndiceEstudiante] = self.Estudiante
+            for i,user in enumerate(Estado.OfficesRevision[self.Offices.Id].Usuarios):
+                if user == anteriorNombre:
+                    Estado.OfficesRevision[self.Offices.Id].Usuarios[i] = self.Estudiante
+                    
         elif self.Offices.Estado == 1:
-            Estado.OfficesLista[self.Offices.Id].Usuarios[self.IndiceEstudiante] = self.Estudiante
+            for i,user in enumerate(Estado.OfficesLista[self.Offices.Id].Usuarios):
+                if user == anteriorNombre:
+                    Estado.OfficesLista[self.Offices.Id].Usuarios[i] = self.Estudiante
         
         await interaction.response.send_message(f"Datos del estudiante han sido cambiado Correctamente, {anteriorNombre} -> {self.Estudiante.IdUsuario}, {anteriorHora} -> {Inputnumero}, {anteriorGrupo} -> Grupo {self.InputGrupoEstudiante} correctamente :)", ephemeral=True)
    
@@ -77,13 +83,13 @@ class formularioEditarOffices(discord.ui.Modal):
     def __init__(self, title, IDOffices):
         super().__init__(title=title[:45], timeout=5*60)
         self.IDOffices = IDOffices
-        self.Offices = None
+        self.Offices = Estado.getOffices(IDOffices)
         
-        # Tiene que entrar en uno
-        if self.IDOffices in Estado.getKeyOfficesLista():
-            self.Offices = Estado.OfficesLista[self.IDOffices]
-        else:
-            self.Offices = Estado.OfficesRevision[self.IDOffices]
+        # # Tiene que entrar en uno
+        # if self.IDOffices in Estado.getKeyOfficesLista():
+        #     self.Offices = Estado.OfficesLista[self.IDOffices]
+        # else:
+        #     self.Offices = Estado.OfficesRevision[self.IDOffices]
             
         self.InputIdOffices = self.IniciarInput(f"Offices: {self.IDOffices}", f"{self.IDOffices}", f"{self.IDOffices}")
         self.InputBloque = self.IniciarInput(f"Bloque de la offices : {self.Offices.bloque}", f"formato aceptado 10-12, 1-3, 3-5", f"{self.Offices.bloque}")
@@ -101,12 +107,12 @@ class formularioEditarOffices(discord.ui.Modal):
     
     async def on_submit(self, interaction):
         
-        if self.InputIdOffices.value not in ["10-12","1-3","3-5","10 - 12","1 - 3","3 - 5"]:
+        if self.InputBloque.value not in ["10-12","1-3","3-5","10 - 12","1 - 3","3 - 5"]:
             await interaction.response.send_message("Error en el formato de las Horas",ephemeral=True)
             return
         
         
-        if self.InputBloque.value in Estado.getKeyOfficesLista() + Estado.getKeyCanalesDeVoz() and not self.IDOffices:
+        if self.InputIdOffices.value in Estado.getKeyOfficesLista() + Estado.getKeyCanalesDeVoz() and not self.IDOffices:
             await interaction.response.send_message("Ya existe una offices con ese nombre",ephemeral=True)
         
         anteriorBloque = self.Offices.bloque
@@ -126,21 +132,21 @@ class formularioEditarOffices(discord.ui.Modal):
         elif self.Offices.Estado == 1:
             Estado.OfficesLista[self.Offices.Id] = self.Offices
         
-        await interaction.response.send_message(f"Offices editada Correctamente :), {anteriorId} -> {self.InputIdOffices.value}, {anteriorBloque} -> {self.InputBloque.value}")
+        await interaction.response.send_message(f"Offices editada Correctamente :) {anteriorId} -> {self.InputIdOffices.value}, {anteriorBloque} -> {self.InputBloque.value}")
     
     
 class formularioAgregarEstudiante(discord.ui.Modal):
     def __init__(self, title, IDOffices, DiscordMiembro : discord.Member):
         super().__init__(title=title, timeout=5*60)
         self.IDOffices = IDOffices
-        self.Offices = None
+        self.Offices = Estado.getOffices(IDOffices)
         self.DiscordMiembro = DiscordMiembro # Se trata como si fuera un estudiante, pero es solo para obtener el miembro directo del servidor
         
         # Tiene que entrar en uno
-        try:
-            self.Offices = Estado.OfficesLista[self.IDOffices]
-        except:
-            self.Offices = Estado.OfficesRevision[self.IDOffices]
+        # try:
+        #     self.Offices = Estado.OfficesLista[self.IDOffices]
+        # except:
+        #     self.Offices = Estado.OfficesRevision[self.IDOffices]
             
         #self.InputNombreEstudiante = self.IniciarInput("Nombre del estudiante", f"", None)
         #self.InputGrupoEstudiante = self.IniciarInput("Grupo del estudiante (Solo la letra)", f"", None)

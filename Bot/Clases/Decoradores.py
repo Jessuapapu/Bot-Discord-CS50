@@ -37,7 +37,7 @@ def valida_roles():
             AutorRoles = [rol.name for rol in interaction.user.roles]
 
             # Validamos si tiene alguno de los roles permitidos
-            if not any(rol in ["Staff", "Admin Staff"] for rol in AutorRoles):
+            if not any(rol in Estado.ListaDeRolesPermitidos for rol in AutorRoles):
                 await interaction.response.send_message(
                     "❌ No tienes los permisos requeridos.",
                     ephemeral=True

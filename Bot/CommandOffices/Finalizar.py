@@ -29,7 +29,7 @@ async def finalizar(interaction: discord.Interaction, ID):
     del Estado.CanalesDeVoz[Office.canal.id]
     Estado.OfficesRevision[ID] = Office 
 
-    tabla = util.CrearTabla(headerTabla,contenidoTabla,[25,9,9,7])
+    tabla = util.CrearTabla(headerTabla,contenidoTabla,None)
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"El tiempo es total en horas\n```\n{tabla}\n```", discord.Color.dark_gold())
             
     await interaction.response.send_message(embed=embed)

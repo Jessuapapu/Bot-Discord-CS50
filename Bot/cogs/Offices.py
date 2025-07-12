@@ -94,22 +94,23 @@ class Offices(commands.Cog):
         
     
     
-    @offices.command(name="editar", description="Edita una office o a un estudiante")
-    @app_commands.describe(id="ID de la Office",accion="Si quieres editar una offices o un estusiante")
-    @app_commands.choices(accion=[
-        discord.app_commands.Choice(name='Offices', value="offices"),
-        discord.app_commands.Choice(name='Estudiantes', value="estudiantes")
-    ])
+    @offices.command(name="editaroffices", description="Edita una office")
+    @app_commands.describe(id="ID de la Office")
     @app_commands.autocomplete(id=util.officesTotal_autocomplete)
     @valida_roles()
     @valida_id_office()
-    async def editar(self, interaction: discord.Interaction, id: str, accion: discord.app_commands.Choice[str]):
-        if accion.value == "offices":
-            await Editar.EditarOffices(interaction,id)
-        elif accion.value == "estudiantes":
-            await Editar.EditarEstudiante(interaction,id)
-        else:
-            await interaction.response.send_message("Error al obtenr la accion, escoge uno de las dos opciones")
+    async def editarOffices(self, interaction: discord.Interaction, id: str):
+        await Editar.EditarOffices(interaction, id)
+       
+    
+    
+    @offices.command(name="editarestudiante", description="Edita a un estudiante")
+    @app_commands.describe(id="ID de la Office",estudiante="Nombra al estudiante")
+    @app_commands.autocomplete(id=util.officesTotal_autocomplete)
+    @valida_roles()
+    @valida_id_office()
+    async def editar(self, interaction: discord.Interaction, id: str, estudiante: discord.Member):
+        await Editar.EditarEstudiante(interaction, id, estudiante)
         
         
         
@@ -128,6 +129,7 @@ class Offices(commands.Cog):
             await Listar.ListaEstudiantes(interaction,id)
         else:
             await interaction.response.send_message("Error al obtenr el metodo de listar, escoge uno de las dos opciones")
+          
             
         
     @offices.command(name="mover", description="Mueve al autor del comando y a otro usuario a un canal de voz. sin que se pause su tiempo")

@@ -69,14 +69,15 @@ class Eventos(commands.Cog):
             return
         
         # SALIDA DEL CANAL DE VOZ
+
         if before.channel and (after.channel is None or before.channel != after.channel):
             if before.channel.id in Estado.getKeyCanalesDeVoz() and user_id in Estado.OfficesLista[Estado.CanalesDeVoz[before.channel.id]].getNombreEstudiantes():
                 Estudiante = Estado.OfficesLista[Estado.CanalesDeVoz[before.channel.id]].getUnicoEstudiante(user_id)
                 await Estudiante.DetenerContador()
 
         # ENTRADA A CANAL DE VOZ
-        elif after.channel and after.channel.id in Estado.getKeyCanalesDeVoz():
             
+        elif after.channel and after.channel.id in Estado.getKeyCanalesDeVoz():
             if user_id in Estado.OfficesLista[Estado.CanalesDeVoz[after.channel.id]].getNombreEstudiantes():
                 
                 # Ya está registrado, solo se reactiva el contador
@@ -87,16 +88,17 @@ class Eventos(commands.Cog):
                 # NO está registrado, enviar botón de confirmación):
                 Offices = Estado.OfficesLista[Estado.CanalesDeVoz[after.channel.id]]
                 view = util.CrearEncuestaSimple([Botones.botonesEntrarOffices("Entrar a offices!!!!", discord.ButtonStyle.green, Offices.Id, member)], (10 * 60))
+                embed = util.CrearMensajeEmbed("¡¡¡¡¡¡¡¡Ingresar a la offices!!!!!!!",f"Hola {user_id}, ¿deseas unirte a la offices?, Recuerda siempre de aceptar la invitacion para tomar en cuenta tu asistencia :) \n\n si no te la envio es porque ya estas registado jeje", discord.Color.random())
                 try:
                     await member.send(
-                        f"Hola {user_id}, ¿deseas unirte a la offices?",
+                        embed=embed,
                         view=view
                     )
                 except discord.Forbidden:
                     canal_texto = after.channel.guild.get_channel(after.channel.id + 1)
                     if canal_texto:
                         await canal_texto.send(
-                            f"{member.mention}, ¿quieres entrar a la oficina?",
+                            f"{member.mention}, ¿quieres entrar a la offices?",
                             view=view
                         )
 

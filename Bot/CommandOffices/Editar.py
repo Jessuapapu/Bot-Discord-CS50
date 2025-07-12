@@ -1,45 +1,26 @@
 import discord
 from Declaraciones import Declaraciones
-from Clases import util, SelectMenus
+from Clases import util, SelectMenus, Formulario
 
 Estado = Declaraciones.EstadoGlobal()
 
-async def EditarEstudiante(interaction: discord.Interaction, IDOffices):
-    headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
-    contenidoTabla = []
-    Contents = None
-    try:
-        Contents = Estado.OfficesRevision[IDOffices]
-    except:
-        Contents = Estado.OfficesLista[IDOffices]
+async def EditarEstudiante(interaction: discord.Interaction, IDOffices, Estudiante: discord.Member):
+    Estudiante = Estado.getEstudiante(Estudiante,IDOffices)
+    if not Estudiante:
+        await interaction.response.send_message("El estudiante esta asociado el estudiante a esa offices", ephemeral=True)
+        return
     
     
-    for estu in Contents.Usuarios:
-        contenidoTabla.append([
-            estu.IdUsuario,
-            estu.grupo,
-            estu.cumplimientoReal,
-            Contents.ListaDeVotos[estu.IdUsuario]
-        ])
-
-    tabla = util.CrearTabla(headerTabla, contenidoTabla, [25,9,9,7])
-    embed = util.CrearMensajeEmbed(
-        "Estudiantes disponibles para editar",
-        f"Selecciona uno del menú.\n```\n{tabla}\n```",
-        discord.Color.dark_gold()
-    )
-
-    view = SelectMenus.SelectEstudianteView(Contents.Usuarios, IDOffices)
-    await interaction.response.send_message(embed=embed, view=view)
-
+    
+    
+    formulario = Formulario.formularioEditarEstu("Edita a un estudiante",IDOffices,Estudiante)
+    
+    await interaction.response.send_modal(formulario)
+    return
+   
 
 async def EditarOffices(interaction: discord.Interaction, IDOffices):
-    ListaOffices = []
-    
-    for oh in Estado.OfficesLista:
-        ListaOffices.append(Estado.OfficesLista[oh])
-    for oh in Estado.OfficesRevision:
-        ListaOffices.append(Estado.OfficesRevision[oh])
+    ListaOffices = Estado.getOfficesTotalValues()
     
     
     headers = ["ID", "Creador", "Bloque", "Estado"]
@@ -52,9 +33,9 @@ async def EditarOffices(interaction: discord.Interaction, IDOffices):
         else:
             estado = "Revision"
             
-        contenido.append([offices.Id, offices.IdUsuario, offices.HoraCreacion, offices.bloque,estado])
+        contenido.append([offices.Id, offices.IdUsuario, offices.bloque,estado])
     
-    tabla = util.CrearTabla(headers,contenido,[25,9,9,7])
+    tabla = util.CrearTabla(headers,contenido,None)
     embed = util.CrearMensajeEmbed("Offices Listadas", f"```\n{tabla}\n```" ,discord.Color.dark_magenta())
     
     view = SelectMenus.SelectOfficesView(IDOffices)

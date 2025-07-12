@@ -14,7 +14,7 @@ class Offices:
         
         # Es la lista de estudiantes activos
         self.Usuarios = Usuarios
-        self.ListaDeVotos = self.generarListaDevotos() # IdUsuario: (cantidad de votos)
+        self.ListaDeVotos = self.generarListaDevotos() 
         self.ControlDeVotos = {}
         
         # Se refiere al estado, 1: Activa, 0: Finalizada
@@ -24,7 +24,12 @@ class Offices:
         
         
         
-    def generarListaDevotos(self):
+    def generarListaDevotos(self) -> dict:
+        """ 
+        Generla Lista de Votos total para la offices, esto es actuamatizado al principio de la offices de forma de constructor
+        
+            retorna ->  IdUsuario: (cantidad de votos) 
+        """
         ListaDeVotos = {}
         for user in self.Usuarios:
             try:
@@ -34,7 +39,8 @@ class Offices:
                 ListaDeVotos[user.IdUsuario] = 0
             
         return ListaDeVotos
-            
+     
+     # Creo que se puede refactorizar mejor esto       
     def getEstudiantes(self):
         return [user.IdUsuario for user in self.Usuarios]
     
@@ -79,6 +85,6 @@ class Offices:
                     await User.iniciarContador()
                 self.Usuarios = list(tmp)
 
-                await asyncio.sleep(5*60)
+                await asyncio.sleep(30*60)
         except asyncio.CancelledError:
                 pass

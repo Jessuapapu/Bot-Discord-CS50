@@ -13,7 +13,7 @@ async def Mover(interaction: discord.Interaction, canal_destino: discord.VoiceCh
            interaction.response.send_message(f"No se puede mover a {otro_miembro.display_name}", ephemeral=True)
            return
         
-        if CanalDeOrigen.id not in list(Estado.CanalesDeVoz.keys()):        
+        if CanalDeOrigen.id not in Estado.getKeyCanalesDeVoz():        
            interaction.response.send_message("El canal de voz No esta en una offices Activa", ephemeral=True)
            return
            

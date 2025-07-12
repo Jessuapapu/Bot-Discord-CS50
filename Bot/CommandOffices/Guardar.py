@@ -17,7 +17,7 @@ from Clases import util
 
 async def guardar(interaction: discord.Interaction, ID):
 
-    Contents = Estado.OfficesRevision[ID]
+    Contents = Estado.getOffices(ID)
 
     if Contents.Estado != 0:
         await interaction.response.send_message("No se ha finalizado la offices.")
@@ -59,7 +59,7 @@ async def guardar(interaction: discord.Interaction, ID):
     for Estu in Contents.Usuarios:
         contenidoTabla.append([Estu.IdUsuario, Estu.grupo, Estu.cumplimientoReal, Estado.OfficesRevision[ID].ListaDeVotos[Estu.IdUsuario]])  
     
-    tabla = util.CrearTabla(headerTabla,contenidoTabla,[25,9,9,7])
+    tabla = util.CrearTabla(headerTabla,contenidoTabla,None)
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
 
     del Estado.OfficesRevision[ID]
