@@ -6,13 +6,11 @@ Estado = Declaraciones.EstadoGlobal()
 
 async def EditarEstudiante(interaction: discord.Interaction, IDOffices, Estudiante: discord.Member):
     Estudiante = Estado.getEstudiante(Estudiante,IDOffices)
+    
     if not Estudiante:
-        await interaction.response.send_message("El estudiante esta asociado el estudiante a esa offices", ephemeral=True)
+        await interaction.response.send_message("El estudiante no esta asociado el estudiante a esa offices", ephemeral=True)
         return
-    
-    
-    
-    
+
     formulario = Formulario.formularioEditarEstu("Edita a un estudiante",IDOffices,Estudiante)
     
     await interaction.response.send_modal(formulario)
@@ -21,8 +19,6 @@ async def EditarEstudiante(interaction: discord.Interaction, IDOffices, Estudian
 
 async def EditarOffices(interaction: discord.Interaction, IDOffices):
     ListaOffices = Estado.getOfficesTotalValues()
-    
-    
     headers = ["ID", "Creador", "Bloque", "Estado"]
     contenido = []
     

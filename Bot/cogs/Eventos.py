@@ -72,11 +72,13 @@ class Eventos(commands.Cog):
 
         if before.channel and (after.channel is None or before.channel != after.channel):
             if before.channel.id in Estado.getKeyCanalesDeVoz() and user_id in Estado.OfficesLista[Estado.CanalesDeVoz[before.channel.id]].getNombreEstudiantes():
+                
+                # El estudiante se obtiene directamente del diccionario, su key es su id que esta asociado al id del canal
                 Estudiante = Estado.OfficesLista[Estado.CanalesDeVoz[before.channel.id]].getUnicoEstudiante(user_id)
                 await Estudiante.DetenerContador()
 
-        # ENTRADA A CANAL DE VOZ
-            
+
+        # ENTRADA A CANAL DE VOZ         
         elif after.channel and after.channel.id in Estado.getKeyCanalesDeVoz():
             if user_id in Estado.OfficesLista[Estado.CanalesDeVoz[after.channel.id]].getNombreEstudiantes():
                 
@@ -88,6 +90,7 @@ class Eventos(commands.Cog):
                 # NO está registrado, enviar botón de confirmación):
                 Offices = Estado.OfficesLista[Estado.CanalesDeVoz[after.channel.id]]
                 view = util.CrearEncuestaSimple([Botones.botonesEntrarOffices("Entrar a offices!!!!", discord.ButtonStyle.green, Offices.Id, member)], (10 * 60))
+                
                 embed = util.CrearMensajeEmbed("¡¡¡¡¡¡¡¡Ingresar a la offices!!!!!!!",f"Hola {user_id}, ¿deseas unirte a la offices?, Recuerda siempre de aceptar la invitacion para tomar en cuenta tu asistencia :) \n\n si no te la envio es porque ya estas registado jeje", discord.Color.random())
                 try:
                     await member.send(

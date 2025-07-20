@@ -9,7 +9,6 @@ class formularioEditarEstu(discord.ui.Modal):
         super().__init__(title=title, timeout=5*60)
         self.IDOffices = IDOffices
         self.Estudiante = Estado.getEstudiante(Estudiante, IDOffices) if type(Estudiante) is not EstudianteClass.Estudiante else Estudiante
-        print(type(self.Estudiante))
         self.Offices = Estado.getOffices(IDOffices)
         
         # # Tiene que entrar en uno (Refactorizado)
@@ -196,7 +195,7 @@ class formularioAgregarEstudiante(discord.ui.Modal):
             
         elif self.Offices.Estado == 1:
             if  self.validarDuplicados(EstudianteNuevo,Estado.OfficesLista[self.Offices.Id].Usuarios):
-                EstudianteNuevo.TiempoTotal = float(self.InputCumplimientoEstu.value) * 3600
+                EstudianteNuevo.TiempoTotal = round(float(self.InputCumplimientoEstu.value) * 3600)
                 await EstudianteNuevo.iniciarContador()
                 Estado.OfficesLista[self.Offices.Id].Usuarios.append(EstudianteNuevo)
                 Estado.OfficesLista[self.Offices.Id].ListaDeVotos[EstudianteNuevo.IdUsuario] = 0
