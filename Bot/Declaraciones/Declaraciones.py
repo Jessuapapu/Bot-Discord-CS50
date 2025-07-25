@@ -24,8 +24,8 @@ class EstadoGlobal:
         self.OfficesRevision: dict[str,OfficeClass.Offices] = {}   # { str(Id): Offices }, Es la estructura la cual guarda la offices que ya terminaron y esta en revision
         self.CanalesDeVoz: dict[str,str] = {}      # { str(Canal): IdOffices }, Es la estructura que asocia una offices con un canal de voz
         
-        #[ Lista de roles que se ocupan en el servidor cs|web ]
-        self.ListaDeRolesPermitidos: list[str] = ["Staff", "Admin", "Admin Staff", "Profesor", "staff"] 
+        #[ Lista de roles que se excluyen o se aceptan en el servidor cs|web ]
+        self.ListaDeRolesPermitidos: list[str] = ["Staff", "Admin", "Admin Staff", "Profesor", "staff", "Bot", "Bots"] 
         
     def getKeyCanalesDeVoz(self) -> list:
         """ Retorna Todas la key de los canales de voz """
@@ -61,7 +61,6 @@ class EstadoGlobal:
     def getEstudiante(self, Estudiante: Member | str, Id) -> EstudianteClass.Estudiante | None:
         """ Metodo para retornar un estudiante directo de la offices """
         office = self.getOffices(Id)
-        print("PI")
         
         if not office:
             # Si no encuentra la offices retorna None

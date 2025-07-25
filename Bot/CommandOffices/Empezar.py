@@ -2,27 +2,12 @@
 import discord
 from Declaraciones import Declaraciones
 
-from Clases import OfficeClass, EstudianteClass
+from Clases.Formularios import FormularioIniciarOffices
 Estado = Declaraciones.EstadoGlobal()
 
-async def empezar(interaction: discord.Interaction, ID, CanalDeVoz: discord.VoiceChannel, Bloque):
+async def empezar(interaction: discord.Interaction, CanalDeVoz: discord.VoiceChannel):
 
-    miembros = [
-        EstudianteClass.Estudiante(miembro, ID) for miembro in CanalDeVoz.members
-        if not any(rol.name in Estado.ListaDeRolesPermitidos for rol in miembro.roles)
-    ]
-
-    if len(miembros) == 0:
-        await interaction.response.send_message("No hay estudiantes conectados.")
-        return
+    form = FormularioIniciarOffices.FormularioIniciarOffices("Inicia una Offices!!!!!!",CanalDeVoz)
     
-    for miembro in miembros:
-        await miembro.iniciarContador()
-
-    Office = OfficeClass.Offices(ID, interaction.user.display_name[8:], miembros, Bloque, CanalDeVoz)
-    Estado.CanalesDeVoz[CanalDeVoz.id] = ID
-    Estado.OfficesLista[ID] = Office
-    await Office.Barrido50()
-    
-    await interaction.response.send_message("Offices Inicializada")
+    await interaction.response.send_modal(form)
     return

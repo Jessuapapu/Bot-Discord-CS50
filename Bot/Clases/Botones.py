@@ -1,15 +1,15 @@
-import discord
+from discord import ButtonStyle, Interaction, ui
 from Declaraciones import Declaraciones
 from Clases import EstudianteClass
 
 Estado = Declaraciones.EstadoGlobal()
 
 class botonBase:
-    def __init__(self, label: str, style: discord.ButtonStyle):
-        self.boton = discord.ui.Button(label=label, style=style)
+    def __init__(self, label: str, style: ButtonStyle):
+        self.boton = ui.Button(label=label, style=style)
         self.boton.callback = self.callBack
 
-    async def callBack(self, interaction_button: discord.Interaction):
+    async def callBack(self, interaction_button: Interaction):
         pass
 
 
@@ -21,7 +21,7 @@ class botonesAsistencia(botonBase):
         self.Offices = Estado.OfficesLista[IdOffices]
         self.boton.callback = self.callBack
 
-    async def callBack(self, interaction_button: discord.Interaction):
+    async def callBack(self, interaction_button: Interaction):
         usuario = interaction_button.user.display_name[10:]
         
         # Valida si el usuario está en la lista de estudiantes de la office
@@ -42,7 +42,7 @@ class botonesEntrarOffices(botonBase):
         self.miembro = Miembro  # string del ID de usuario
         self.boton.callback = self.callBack
 
-    async def callBack(self, interaction: discord.Interaction):
+    async def callBack(self, interaction: Interaction):
         
         if str(interaction.user.name) == str(self.miembro.name):
             

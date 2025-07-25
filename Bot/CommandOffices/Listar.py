@@ -27,6 +27,7 @@ async def ListaOffices(interaction:discord.Interaction):
     
 async def ListaEstudiantes(interaction:discord.Interaction, ID: str):
     Office = Estado.getOffices(ID)
+    print(Office)
 
     if not Office:
         await interaction.response.send_message("Error al obtener la lista de usuarios de la offices indicada o no existe",ephemeral=True)

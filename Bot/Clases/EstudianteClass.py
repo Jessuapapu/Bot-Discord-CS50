@@ -1,7 +1,7 @@
-import discord
+from discord import Member
 import asyncio
 class Estudiante:
-    def __init__(self, Usuario: discord.Member | None, IdOffices):
+    def __init__(self, Usuario: Member | None, IdOffices):
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su nombre
         self.IdUsuario = Usuario.display_name[10:]
         self.Usuario = Usuario
@@ -75,6 +75,7 @@ class Estudiante:
         return (isinstance(other,Estudiante) and self.IdDiscord == other.IdDiscord)
     
     def __hash__(self):
-        return hash((self.IdUsuario,self.grupo))
+        return hash(self.IdDiscord)
+
         
         

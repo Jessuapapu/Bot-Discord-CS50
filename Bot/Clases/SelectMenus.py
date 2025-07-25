@@ -1,10 +1,10 @@
 import discord
-from . import Formulario
+from Formularios import FormularioBase
 from Declaraciones import Declaraciones
 
 Estado = Declaraciones.EstadoGlobal()
 
-# Clase Refactorizada
+# Clase En desuso
 # class SelectEstudianteView(discord.ui.View):
 #     def __init__(self, estudiantes, IDOffices):
 #         super().__init__(timeout=60)
@@ -19,7 +19,7 @@ class SelectOfficesView(discord.ui.View):
 
 #-----------------------------------------------------------------------------------------------------------
 
-# Clase Refactorizada
+# Clase desuso
 # class SelectEstudiante(discord.ui.Select):
 #     def __init__(self, estudiantes, IDOffices):
 #         self.IDOffices = IDOffices
@@ -69,7 +69,7 @@ class SelectOffices(discord.ui.Select):
 
     async def callback(self, interaction: discord.Interaction):
         seleccionado = self.values[0]
-        modal = Formulario.formularioEditarOffices( f"Editando la offices {seleccionado}", seleccionado)
+        modal = FormularioBase.formularioEditarOffices( f"Editando la offices {seleccionado}", seleccionado)
         await interaction.response.send_modal(modal)
         
 

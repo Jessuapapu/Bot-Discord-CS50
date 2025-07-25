@@ -1,8 +1,43 @@
-import discord
+from discord import VoiceChannel
+from Clases.EstudianteClass import Estudiante
 import datetime, asyncio
 
 class Offices:
-    def __init__(self, Id, IdUsuario, Usuarios: list, bloque, CanalVoz: discord.VoiceChannel):
+    """
+    Clase Offices
+    Representa una "office" o sesión de grupo en Discord, gestionando usuarios, staff, votos y limpieza periódica.
+    
+        Id (int): Identificador único de la office.
+        IdUsuario (int): Identificador del usuario creador de la office.
+        HoraCreacion (str): Hora en la que se creó la office (formato HH:MM).
+        bloque (Any): Información adicional sobre el bloque o grupo al que pertenece la office.
+        canal (VoiceChannel): Canal de voz de Discord asociado a la office.
+        NombresStaff (list): Lista de nombres del staff asignado a la office.
+        Usuarios (list): Lista de estudiantes activos en la office.
+        ListaDeVotos (dict): Diccionario que almacena los votos de cada usuario.
+        ControlDeVotos (dict): Diccionario para el control de votos durante la sesión.
+        Estado (int): Estado actual de la office (1: Activa, 0: Finalizada).
+        _Limpieza (asyncio.Task): Tarea asíncrona para la limpieza periódica de la lista de usuarios.
+        
+    Métodos:
+        generarListaDevotos() -> dict:
+            Genera y retorna un diccionario con los usuarios y la cantidad de votos inicializada en 0.
+        getEstudiantes() -> list:
+            Retorna una lista con los identificadores de usuario de los estudiantes activos.
+        getNombreEstudiantes() -> list:
+            Retorna una lista con los identificadores de usuario de los estudiantes activos (igual que getEstudiantes).
+        getUnicoEstudiante(IdUsuario) -> Estudiante | None:
+            Retorna el objeto usuario correspondiente al IdUsuario dado, o None si no existe.
+        iniciarContadorDeVotos():
+            Inicializa o reinicia el contador de votos para todos los estudiantes.
+        async Barrido50():
+            Inicia la tarea asíncrona de limpieza periódica de la lista de usuarios.
+        async limpieza():
+            Realiza la limpieza periódica de la lista de usuarios, eliminando duplicados y reiniciando contadores.
+        setStaff(Nombres: list[str]):
+            Asigna la lista de nombres del staff a la office.
+   """
+    def __init__(self, Id, IdUsuario, Usuarios: list[Estudiante], bloque, CanalVoz: VoiceChannel, Staff: list = []):
         hora = datetime.datetime.now()
         
         # Informacion de la offices
@@ -10,7 +45,10 @@ class Offices:
         self.IdUsuario = IdUsuario
         self.HoraCreacion = hora.strftime("%H:%M")
         self.bloque = bloque
-        self.canal = CanalVoz 
+        self.canal = CanalVoz
+        
+        # Informacion del Staff
+        self.NombresStaff = Staff
         
         # Es la lista de estudiantes activos
         self.Usuarios = Usuarios
@@ -80,11 +118,20 @@ class Offices:
                 if self.Estado != 1:
                     break
                 
-                tmp = set(self.Usuarios)
+                # Eliminar duplicados manteniendo el orden
+                tmp = list(dict.fromkeys(self.Usuarios))
+
                 for User in tmp:
                     await User.iniciarContador()
-                self.Usuarios = list(tmp)
+
+                self.Usuarios = tmp
 
                 await asyncio.sleep(30*60)
         except asyncio.CancelledError:
-                pass
+            pass
+
+            
+            
+    def setStaff(self,Nombres:list[str]):
+        self.NombresStaff = Nombres
+        return

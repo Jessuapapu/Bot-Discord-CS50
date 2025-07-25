@@ -1,11 +1,13 @@
-import discord
+
 import os
 
-from discord import app_commands
+from discord.app_commands import Choice
+from discord import Interaction, Embed, ui, Color
+
 from typing import List
 from Declaraciones import Declaraciones
 from table2ascii import table2ascii as t2a
-from typing import Optional
+
 
 Estado = Declaraciones.EstadoGlobal()
 
@@ -18,7 +20,7 @@ Estado = Declaraciones.EstadoGlobal()
 # No necesario ya
 # # Validacion de roles aceptados
 # def VerificacionRoles(interaction):
-#     RolesAceptados = ['Admin Discord','Staff']
+#     RolesAceptados = ['Admin ','Staff']
 #     # Se obtiene los roles de autor del mensaje
 #     AutorRoles = [rol.name for rol in interaction.author.roles[1:]]
 
@@ -26,9 +28,9 @@ Estado = Declaraciones.EstadoGlobal()
 #         return False
 #     return True
 
-def CrearMensajeEmbed(Titulo = "", descripcion = "", color = discord.Color.blue()) -> discord.Embed:
+def CrearMensajeEmbed(Titulo = "", descripcion = "", color = Color.blue()) -> Embed:
     """ funcion encargada en crear mensajes embed """
-    ListaEmbebida = discord.Embed(  
+    ListaEmbebida = Embed(  
             title=Titulo,     
             description = descripcion ,
             color=color
@@ -48,9 +50,9 @@ def CrearTabla(headers: list[str], Body: list[list[str]], Column_width: list[int
 
 
 
-def CrearEncuestaSimple(Botones:list, tiempo) -> discord.ui.View:
+def CrearEncuestaSimple(Botones:list, tiempo) -> ui.View:
     """ Funcion encargada para generar Encuestas """
-    view = discord.ui.View(timeout = tiempo)
+    view = ui.View(timeout = tiempo)
     
     for boton in Botones:
         view.add_item(boton.boton)
@@ -60,50 +62,50 @@ def CrearEncuestaSimple(Botones:list, tiempo) -> discord.ui.View:
 
 
 # Función de autocomplete
-async def officesActivasId_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+async def officesActivasId_autocomplete(interaction: Interaction, current: str) -> List[Choice[str]]:
 
     # Obtenemos todos los IDs de offices activas
     opciones = list(Estado.OfficesLista.keys())
 
     # Filtramos por lo que el usuario esté escribiendo (current)
     resultados = [
-        app_commands.Choice(name=office_id, value=office_id)
+        Choice(name=office_id, value=office_id)
         for office_id in opciones if current.lower() in office_id.lower()
     ]
 
-    return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
+    return resultados[:25]  #  permite máximo 25 opciones por autocomplete
 
-async def officesRevisionId_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+async def officesRevisionId_autocomplete(interaction: Interaction, current: str) -> List[Choice[str]]:
 
     # Obtenemos todos los IDs de offices activas
     opciones = list(Estado.OfficesRevision.keys())
 
     # Filtramos por lo que el usuario esté escribiendo (current)
     resultados = [
-        app_commands.Choice(name=office_id, value=office_id)
+        Choice(name=office_id, value=office_id)
         for office_id in opciones if current.lower() in office_id.lower()
     ]
 
-    return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
+    return resultados[:25]  #  permite máximo 25 opciones por autocomplete
 
 
 # Función de autocomplete
-async def officesTotal_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+async def officesTotal_autocomplete(interaction: Interaction, current: str) -> List[Choice[str]]:
 
     # Obtenemos todos los IDs de offices activas
     opciones = list(Estado.OfficesLista.keys()) + list(Estado.OfficesRevision.keys()) 
 
     # Filtramos por lo que el usuario esté escribiendo (current)
     resultados = [
-        app_commands.Choice(name=office_id, value=office_id)
+        Choice(name=office_id, value=office_id)
         for office_id in opciones if current.lower() in office_id.lower()
     ]
 
-    return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
+    return resultados[:25]  #  permite máximo 25 opciones por autocomplete
 
 
 # Función de autocomplete
-async def Pdfs_autocomplete(interaction: discord.Interaction, current: str) -> List[app_commands.Choice[str]]:
+async def Pdfs_autocomplete(interaction: Interaction, current: str) -> List[Choice[str]]:
 
     # Obtenemos todos los IDs de offices activas
     ruta_Pdfs = "./Reportes"
@@ -111,8 +113,8 @@ async def Pdfs_autocomplete(interaction: discord.Interaction, current: str) -> L
 
     # Filtramos por lo que el usuario esté escribiendo (current)
     resultados = [
-        app_commands.Choice(name=Pdf, value=Pdf)
+        Choice(name=Pdf, value=Pdf)
         for Pdf in ListaArchivos if current.lower() in Pdf.lower() and Pdf != 'si.txt'
     ]
 
-    return resultados[:25]  # Discord permite máximo 25 opciones por autocomplete
+    return resultados[:25]  #  permite máximo 25 opciones por autocomplete
