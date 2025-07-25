@@ -1,5 +1,6 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <style>
@@ -23,10 +24,17 @@
             line-height: 1.3;
         }
 
+        .logo-container {
+            text-align: center;
+            vertical-align: middle;
+            /* CENTRADO vertical */
+        }
+
         .logo-container img {
             height: 45px;
             width: auto;
-            display: block;
+            vertical-align: middle;
+            /* display: block; <-- quitalo o comentalo */
         }
 
 
@@ -44,7 +52,8 @@
             font-size: 9px;
         }
 
-        th, td {
+        th,
+        td {
             border: 0.5px solid #666;
             padding: 3px 5px;
             text-align: center;
@@ -52,27 +61,49 @@
             word-wrap: break-word;
         }
 
-        th.col-num, td.col-num {
+        th.col-num,
+        td.col-num {
             width: 30px;
         }
 
-        th.col-nombre, td.col-nombre {
+        th.col-nombre,
+        td.col-nombre {
             width: 50%;
         }
 
-        th.col-grupo, td.col-grupo {
+        th.col-grupo,
+        td.col-grupo {
             width: 20%;
         }
 
-        th.col-cumpl, td.col-cumpl {
+        th.col-cumpl,
+        td.col-cumpl {
             width: 27%;
         }
 
         tbody tr:nth-child(even) {
             background-color: #f7f7f7;
         }
+
+        /* Lista vertical centrada y más compacta */
+        .staff-container {
+            text-align: center;
+        }
+
+        .staff-list {
+            padding-left: 0;
+            margin: 0;
+            list-style: none;
+            font-size: 9px;
+            line-height: 1;
+        }
+
+        .staff-list li {
+            margin: 0;
+        }
     </style>
 </head>
+
 <body>
 
     <table class="header">
@@ -82,14 +113,14 @@
                 <img src="{{ logo }}">
             </td>
 
-            <!-- Caja staff -->
-            <td>
-                    <p style="font-size: 10px;">STAFF</p>
-                    <ul>
+            <!-- Caja staff en lista vertical centrada -->
+            <td class="staff-container">
+                <p style="font-size: 10px; margin-bottom: 2px;"><strong>STAFF:</strong></p>
+                <ul class="staff-list">
                     {% for NombresStaff in Staff %}
-                    <li>{{ NombresStaff }}</li>
+                    <li> {{ NombresStaff }}</li>
                     {% endfor %}
-                    </ul>
+                </ul>
             </td>
 
             <!-- Info -->
@@ -100,7 +131,7 @@
             </td>
         </tr>
     </table>
-    
+
     <table class="data-table">
         <tr>
             <th class="col-num" style="background-color: #8B0000; color: white;">#</th>
@@ -121,4 +152,5 @@
     </table>
 
 </body>
+
 </html>

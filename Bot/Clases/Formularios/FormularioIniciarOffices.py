@@ -6,7 +6,7 @@ from Clases.EstudianteClass import Estudiante
 
 from Declaraciones import Declaraciones
 import datetime
-import re
+
 from discord import Interaction, VoiceChannel
 
 Estado = Declaraciones.EstadoGlobal()
@@ -18,9 +18,9 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
         self.CanalDeVoz = CanalDeVoz
         
         self.informacion = self.obtenerId()
-        self.InputIDOffices = self.IniciarInput(f"Sem-{self.informacion['Dia']}-{self.informacion['Bloque']}", "Ejem: 1-S03-Martes–10-12", "", True)
+        self.InputIDOffices = self.IniciarInput("Ingrese el Id (ojo con el fomrato)!!", "Ejem: 1-S03-Martes–10-12", f"Sem-{self.informacion['Dia']}-{self.informacion['Bloque']}", True)
         
-        self.InputBloque = self.IniciarInput(f"Ingrese el bloque: {self.informacion["Bloque"]}","Ejem: 8-10, 1-3"," ", True)
+        self.InputBloque = self.IniciarInput(f"Ingrese el bloque: ", "Ejem: 8-10, 1-3", f"{self.informacion["Bloque"]}", True)
         self.InputStaff = self.IniciarInput("Ingrese los codigos del staff","Ejem: pcastillo, dknauth, ecalix, bgarcia", " ")
                            
         self.add_item(self.InputIDOffices)
@@ -45,10 +45,6 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
         
         # informacion[semana] = SEMANA DEL SISTEMA (aun por hacer)
         return informacion
-    
-    def es_formato_valido(self,texto,formato):
-        patron = formato
-        return re.match(patron, texto, re.IGNORECASE) is not None
     
     async def on_submit(self,interaction:Interaction):
         
@@ -76,20 +72,21 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
             await miembro.iniciarContador()
 
         # Retorna formateado los nombres de Staff de tal forma: ["jsolis","apalacios","bgarcia","akelly"]
-        staff = self.InputStaff.value.replace(' ','').split(',') if self.InputStaff.value != " " else []
+        staff = self.InputStaff.value.replace(' ','').split(',') if self.InputStaff.value != "" else []
         
         Office = Offices(ID, interaction.user.display_name[8:], miembros, Bloque, self.CanalDeVoz, staff)
         Estado.CanalesDeVoz[self.CanalDeVoz.id] = ID
         Estado.OfficesLista[ID] = Office
         await Office.Barrido50()
-        staffNombres = ""
-        print(self.InputStaff.value)
         
-        if self.InputStaff.value is not "":
+        
+        staffNombres = " "
+        if self.InputStaff.value == "":
+            staffNombres =  "No se registraron los codigos de staff!!!!"
+        else:
             for Nombres in staff:
                 staffNombres += Nombres + " "
-        else:
-            staffNombres =  "No se registraron los codigos de staff!!!!"
+            
         
         
         embed = CrearMensajeEmbed("Offices Inicializada :)", f"Datos: \n\tId -> {ID}\n\tBloque -> {Bloque}\n\tCodigos de Staff -> {staffNombres}")

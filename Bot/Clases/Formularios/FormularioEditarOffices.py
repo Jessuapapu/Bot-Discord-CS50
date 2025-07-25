@@ -17,8 +17,8 @@ class formularioEditarOffices(FormularioBase.formularioBase):
         # else:
         #     self.Offices = Estado.OfficesRevision[self.IDOffices]
             
-        self.InputIdOffices = self.IniciarInput(f"Offices: {self.IDOffices}", f"{self.IDOffices}", f"{self.IDOffices}")
-        self.InputBloque = self.IniciarInput(f"Bloque de la offices : {self.Offices.bloque}", f"formato aceptado 10-12, 1-3, 3-5", f"{self.Offices.bloque}")
+        self.InputIdOffices = self.IniciarInput(f"Id: {self.IDOffices}", f"{self.IDOffices}", f"{self.IDOffices}",True)
+        self.InputBloque = self.IniciarInput(f"Bloque de la offices : {self.Offices.bloque}", f"formato aceptado 10-12, 1-3, 3-5", f"{self.Offices.bloque}",True)
         
         nombres = " "
         if self.Offices.NombresStaff is not []:
@@ -39,7 +39,7 @@ class formularioEditarOffices(FormularioBase.formularioBase):
         
     async def on_submit(self, interaction: Interaction):
         
-        if self.InputBloque.value not in ["10-12","1-3","3-5","10 - 12","1 - 3","3 - 5"]:
+        if self.InputBloque == " " or not self.es_formato_valido(self.InputBloque.value, r"\b(\d{1,2})-(\d{1,2})\s*([aApP][mM])?\b"):
             await interaction.response.send_message("Error en el formato de las Horas",ephemeral=True)
             return
         
@@ -77,20 +77,36 @@ class formularioEditarOffices(FormularioBase.formularioBase):
         Para la primera entrada se le llamara A y a la segunda B
         
         Siendo que la Intersección de ambos conjuntos (A & B) son los codigos que no cambiaron, es decir lo codigos estan en ambos conjuntos
-        y lo llamaremos
+        y lo llamaremos Conjunto C
         
         Sabiendo esto, si hacemos una diferencia con respecto C a Ambos conjuntos (A y B) obtendremos los codigos que se eliminaron y se añadieron
         respectivamente 
         """
-        
+
         ConjuntoA = set(anteriorstaff)
         ConjuntoB = set(self.Offices.NombresStaff)
         ConjuntoC = ConjuntoA & ConjuntoB
-        
-        Añadidos =  ConjuntoB - ConjuntoC
+    
+        Añadidos = ConjuntoB - ConjuntoC
         Eliminados = ConjuntoA - ConjuntoC
-        
-        
-        embed = CrearMensajeEmbed(f"Offices editada Correctamente :)",f"{anteriorId} -> {self.InputIdOffices.value}\n {anteriorBloque} -> {self.InputBloque.value}\n Staff añadido: {Añadidos}\n Staff eliminados: {Eliminados}")
+    
+        # Construir mensaje condicionalmente
+        staff_cambios = ""
+        if not Añadidos and not Eliminados:
+            staff_cambios = "Sin cambios en el staff."
+        else:
+            if Añadidos:
+                staff_cambios += f"Staff añadido: {', '.join(Añadidos)}\n"
+            if Eliminados:
+                staff_cambios += f"Staff eliminado: {', '.join(Eliminados)}"
+    
+        # Crear embed
+        embed = CrearMensajeEmbed(
+            "Offices editada Correctamente :)",
+            f"{anteriorId} -> {self.InputIdOffices.value}\n"
+            f"{anteriorBloque} -> {self.InputBloque.value}\n"
+            f"{staff_cambios}"
+        )
         await interaction.response.send_message(embed=embed)
+
     

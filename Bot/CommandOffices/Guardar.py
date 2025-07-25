@@ -4,7 +4,7 @@ from Declaraciones import Declaraciones
 import os
 import datetime
 
-from Clases import util
+
 Estado = Declaraciones.EstadoGlobal()
 
 # Librerias para generar los PDFs -------------------------
@@ -32,9 +32,14 @@ async def guardar(interaction: discord.Interaction, ID):
     
     ruta_base = os.path.dirname(os.path.dirname(__file__))
     ruta_plantillas = os.path.join(ruta_base, 'Plantilla')
+    
     # Configuramos Jinja
     env = Environment(loader=FileSystemLoader(ruta_plantillas))
     template = env.get_template('Plantilla.html')
+
+    nombresStaff = []
+    for staff in Contents.NombresStaff:
+        nombresStaff.append(staff)
 
     ahora = datetime.datetime.now()
     html_renderizado = template.render({
@@ -42,7 +47,8 @@ async def guardar(interaction: discord.Interaction, ID):
         "Fecha": f"Día {ahora.day} del Mes {ahora.month}",
         "Bloque": Contents.bloque,
         "Offices": ID,
-        "logo": os.path.join(ruta_plantillas, "Logo.png").replace("\\", "/")
+        "logo": os.path.join(ruta_plantillas, "Logo.png").replace("\\", "/"),
+        "Staff": nombresStaff
     })
 
     ruta_pdf = os.path.join("./Reportes", f"Reporte {ID}.pdf")

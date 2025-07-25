@@ -6,7 +6,7 @@ app = Flask('')
 
 @app.route('/')
 def index():
-    return 'Botsito de CS50 JAJJAJAJ'
+    return 'Botsito de CS50 o WEB JAJJAJAJ'
 
 def run():
     app.run(host="0.0.0.0",port=10000)
