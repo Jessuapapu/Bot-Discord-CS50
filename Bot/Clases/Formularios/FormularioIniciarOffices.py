@@ -2,10 +2,12 @@ from Clases.Formularios import FormularioBase
 from Clases.util import CrearMensajeEmbed
 from Clases.OfficeClass import Offices
 from Clases.EstudianteClass import Estudiante
-
+from zoneinfo import ZoneInfo
 
 from Declaraciones import Declaraciones
 import datetime
+from datetime import datetime
+
 
 from discord import Interaction, VoiceChannel
 
@@ -30,22 +32,27 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
             
     def obtenerId(self):
         informacion = {}
-        dias_semana = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"]
-        informacion["Dia"] = dias_semana[datetime.date.today().weekday()]
-        
-        hora = (int(datetime.datetime.now().strftime("%H")) % 12)
-        AmyPm = "am" if int(datetime.datetime.now().strftime("%H")) + 2 <= 12 else "pm"
-        horaMasDos = hora + 2 if int(datetime.datetime.now().strftime("%H")) + 2 < 12 else (hora + 2) % 12
+        dias_semana = ["lun", "mar", "mie", "jue", "vie", "sab", "dom"]
 
-        # Hora(en el momento) - horaMasDos(Am o Pm) <- el Am o Pm va junto
-        # ejemplo -> hora-horaMAsDosAm -> 8-10Am
-        bloque = str(str(hora) + "-" + str(horaMasDos) + AmyPm)
-        
+        # Obtener la hora actual en zona Nicaragua
+        ahora = datetime.now(ZoneInfo("America/Managua"))
+
+        dia_semana = dias_semana[ahora.weekday()]
+        informacion["Dia"] = dia_semana
+
+        hora_actual_24 = ahora.hour
+        hora_inicio = hora_actual_24 % 12 or 12
+
+        hora_mas_dos_24 = (hora_actual_24 + 2) % 24
+        hora_fin = hora_mas_dos_24 % 12 or 12
+
+        am_pm = "am" if hora_mas_dos_24 < 12 else "pm"
+
+        bloque = f"{hora_inicio}-{hora_fin}{am_pm}"
         informacion["Bloque"] = bloque
-        
-        # informacion[semana] = SEMANA DEL SISTEMA (aun por hacer)
+
         return informacion
-    
+
     async def on_submit(self,interaction:Interaction):
         
         if not self.es_formato_valido(self.InputIDOffices.value, r"^\d+-(S|s)\d{2}-(lun(?:es)?|mar(?:tes)?|mie(?:rcoles)?|jue(?:ves)?|vie(?:rnes)?|sab(?:ado)?|dom(?:ingo)?)[–-](\d{1,2})-(\d{1,2})\s*([aApP][mM])$"):
