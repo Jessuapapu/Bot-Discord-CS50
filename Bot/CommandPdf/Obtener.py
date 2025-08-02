@@ -10,9 +10,11 @@ async def obtener(interation : discord.Interaction, NombreDeArchivo):
             return
     await ctx.send(f"No se encontró el Id de archivo {NombreDeArchivo}")"""
     
-    if not os.path.exists(f"./Reportes/{NombreDeArchivo}"): 
+    ruta_base = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # Apunta a Bot/
+    ruta_Pdfs = os.path.join(ruta_base, 'Reportes')
+    if not os.path.exists(ruta_Pdfs + "/" + NombreDeArchivo): 
         await interation.response.send_message("Error al cargar el pdf o no existe")
         return
     else:
-        await interation.response.send_message(file=discord.File(f"./Reportes/{NombreDeArchivo}"))
+        await interation.response.send_message(file=discord.File(ruta_Pdfs + "/" + NombreDeArchivo))
         return

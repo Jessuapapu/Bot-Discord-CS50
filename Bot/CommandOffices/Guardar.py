@@ -1,16 +1,12 @@
-
 import discord
 from Declaraciones import Declaraciones
 import os
 import datetime
 
-
 Estado = Declaraciones.EstadoGlobal()
 
-# Librerias para generar los PDFs -------------------------
-#   Jinja La que genera el html a partir de una plantilla
+# Librerías para generar PDFs
 from jinja2 import Environment, FileSystemLoader
-#   xhtml2pdf genera el Pdf apartir del html generado con jinja (nota: NO sosporta bien el css y quedo mas o menos simple xd)
 from xhtml2pdf import pisa
 
 from Clases import util
@@ -22,24 +18,18 @@ async def guardar(interaction: discord.Interaction, ID):
     if Contents.Estado != 0:
         await interaction.response.send_message("No se ha finalizado la offices.")
         return
-    
-    # Hace falta el formato de los estudiantes (Solucionado)
-    """Estudiantes = [
-        util.fomratoEstudiante(user.IdUsuario, user.TiempoTotal)
-        for user in 
-    ]
-    """
-    
-    ruta_base = os.path.dirname(os.path.dirname(__file__))
+
+    # Rutas relativas partiendo desde este archivo:
+    ruta_base = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # Apunta a Bot/
     ruta_plantillas = os.path.join(ruta_base, 'Plantilla')
-    
-    # Configuramos Jinja
+    ruta_reportes = os.path.join(ruta_base, 'Reportes')
+    os.makedirs(ruta_reportes, exist_ok=True)  # Crea carpeta Reportes si no existe
+
+    # Configurar Jinja
     env = Environment(loader=FileSystemLoader(ruta_plantillas))
     template = env.get_template('Plantilla.html')
 
-    nombresStaff = []
-    for staff in Contents.NombresStaff:
-        nombresStaff.append(staff)
+    nombresStaff = [staff for staff in Contents.NombresStaff]
 
     ahora = datetime.datetime.now()
     html_renderizado = template.render({
@@ -51,23 +41,27 @@ async def guardar(interaction: discord.Interaction, ID):
         "Staff": nombresStaff
     })
 
-    ruta_pdf = os.path.join("./Reportes", f"Reporte {ID}.pdf")
+    ruta_pdf = os.path.join(ruta_reportes, f"Reporte {ID}.pdf")
     with open(ruta_pdf, "w+b") as resultado:
         pisa_status = pisa.CreatePDF(html_renderizado, dest=resultado)
 
     if pisa_status.err:
-        await interaction.response.send_message.send("Error al generar el PDF.")
+        await interaction.response.send_message("Error al generar el PDF.")
         return
 
     headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
     contenidoTabla = []
     
     for Estu in Contents.Usuarios:
-        contenidoTabla.append([Estu.IdUsuario, Estu.grupo, Estu.cumplimientoReal, Estado.OfficesRevision[ID].ListaDeVotos[Estu.IdUsuario]])  
+        contenidoTabla.append([
+            Estu.IdUsuario,
+            Estu.grupo,
+            Estu.cumplimientoReal,
+            Estado.OfficesRevision[ID].ListaDeVotos[Estu.IdUsuario]
+        ])  
     
-    tabla = util.CrearTabla(headerTabla,contenidoTabla,None)
+    tabla = util.CrearTabla(headerTabla, contenidoTabla, None)
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
 
     del Estado.OfficesRevision[ID]
     await interaction.response.send_message(embed=embed, file=discord.File(ruta_pdf))
-    return

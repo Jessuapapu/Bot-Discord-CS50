@@ -108,7 +108,8 @@ async def officesTotal_autocomplete(interaction: Interaction, current: str) -> L
 async def Pdfs_autocomplete(interaction: Interaction, current: str) -> List[Choice[str]]:
 
     # Obtenemos todos los IDs de offices activas
-    ruta_Pdfs = "./Reportes"
+    ruta_base = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  # Apunta a Bot/
+    ruta_Pdfs = os.path.join(ruta_base, 'Reportes')
     ListaArchivos = os.listdir(ruta_Pdfs)
 
     # Filtramos por lo que el usuario esté escribiendo (current)
