@@ -20,7 +20,7 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
         self.CanalDeVoz = CanalDeVoz
         
         self.informacion = self.obtenerId()
-        self.InputIDOffices = self.IniciarInput("Ingrese el Id (ojo con el fomrato)!!", "Ejem: 1-S03-Martes–10-12", f"Sem-{self.informacion['Dia']}-{self.informacion['Bloque']}", True)
+        self.InputIDOffices = self.IniciarInput("Ingrese el Id, ojo con el fomrato!!", "Ejem: 1-S03-Martes–10-12", f"Sem-{self.informacion['Dia']}-{self.informacion['Bloque']}", True)
         
         self.InputBloque = self.IniciarInput(f"Ingrese el bloque: ", "Ejem: 8-10, 1-3", f"{self.informacion["Bloque"]}", True)
         self.InputStaff = self.IniciarInput("Ingrese los codigos del staff","Ejem: pcastillo, dknauth, ecalix, bgarcia", " ")
