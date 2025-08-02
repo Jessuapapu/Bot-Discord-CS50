@@ -231,7 +231,7 @@ class App(tk.Tk):
 
         self.students_tree = ttk.Treeview(
             self.frame_details,
-            columns=("Nombre", "Grupo", "Tiempo (s)", "Cumplimiento"),
+            columns=("Nombre", "Grupo", "Tiempo (S)", "Cumplimiento"),
             show="headings",
             height=10
         )
