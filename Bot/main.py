@@ -102,7 +102,6 @@ class BotController:
 
             self.text_widget.after(0, append)
 
-    
     def get_repo_path(self):
         """
         Devuelve la ruta absoluta a la carpeta raíz del repo (donde está .git),
@@ -110,19 +109,13 @@ class BotController:
         En modo PyInstaller busca la ruta del ejecutable y sube.
         """
         if getattr(sys, "frozen", False):
-            # Estamos corriendo en .exe
             exe_dir = os.path.dirname(sys.executable)
-            # Asumiendo estructura: Bot Discord/ (con .git) y dentro Bot/ con main.py
-            # exe_dir apunta a Bot Discord/Bot o puede ser diferente, subimos un nivel
-            repo_dir = os.path.abspath(os.path.join(exe_dir, ".."))  
+            repo_dir = os.path.abspath(os.path.join(exe_dir, ".."))
         else:
-            # Modo desarrollo: repo es un nivel arriba de esta carpeta Bot
             current_file_dir = os.path.dirname(os.path.abspath(__file__))
             repo_dir = os.path.abspath(os.path.join(current_file_dir, "..", ".."))
 
-        # Comprobar que exista .git en repo_dir
         if not os.path.isdir(os.path.join(repo_dir, ".git")):
-            # Si no existe, imprimir advertencia (pero devolver anyway para evitar crash)
             print(f"Advertencia: No se encontró carpeta .git en {repo_dir}")
         return repo_dir
 
@@ -260,6 +253,25 @@ class BotController:
             self.logger.error(f"Error cambiando a commit {commit_sha}: {e.output.decode('utf-8')}")
             return False
 
+    def get_commit_details(self):
+        repo = self.get_repo_path()
+        try:
+            output = subprocess.check_output(
+                ["git", "show", "-s", "--format=%H%n%an%n%ad%n%s", "HEAD"],
+                cwd=repo,
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+            lines = output.strip().split('\n')
+            if len(lines) >= 4:
+                commit_hash, author, date, message = lines[0], lines[1], lines[2], lines[3]
+                return f"Commit: {commit_hash}\nAutor: {author}\nFecha: {date}\nMensaje: {message}"
+            else:
+                return "Detalles del commit no disponibles."
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f"Error obteniendo detalles del commit: {e.output.decode('utf-8')}")
+            return "Error obteniendo detalles del commit."
+
 class App(tk.Tk):
     def __init__(self, token):
         super().__init__()
@@ -354,6 +366,9 @@ class App(tk.Tk):
 
         self.label_branch = tk.Label(self.git_frame, text="Branch: cargando...")
         self.label_branch.pack(anchor="w", padx=5, pady=5)
+
+        self.text_commit_details = tk.Text(self.git_frame, height=5, state='disabled')
+        self.text_commit_details.pack(fill=tk.X, padx=5, pady=5)
 
         self.branches_var = tk.StringVar(value=[])
         self.listbox_branches = tk.Listbox(self.git_frame, listvariable=self.branches_var, height=10)
@@ -453,53 +468,55 @@ class App(tk.Tk):
                 self.students_tree.delete(item_id)
 
         for uid, est in estudiantes_dict.items():
-            self.students_tree.insert(
-                "",
-                "end",
-                values=(est.IdUsuario, est.grupo, est.TiempoTotal, est.cumplimientoReal)
-            )
+            self.students_tree.insert("", "end", values=(est.IdUsuario, est.grupo, est.TiempoTotal, est.cumplimientoReal))
 
     def refresh_git_info(self):
         commit = self.bot_controller.get_current_commit()
         branch = self.bot_controller.get_current_branch()
         branches = self.bot_controller.list_branches()
+        details = self.bot_controller.get_commit_details()
 
         self.label_commit.config(text=f"Commit: {commit}")
         self.label_branch.config(text=f"Branch: {branch}")
 
-        self.branches_var.set(branches)
+        self.text_commit_details.configure(state='normal')
+        self.text_commit_details.delete("1.0", tk.END)
+        self.text_commit_details.insert(tk.END, details)
+        self.text_commit_details.configure(state='disabled')
 
+        self.branches_var.set(branches)
         self.after(60000, self.refresh_git_info)
 
     def checkout_selected_branch(self):
-        selected = self.listbox_branches.curselection()
-        if not selected:
-            messagebox.showwarning("Advertencia", "Seleccione una rama para cambiar.")
+        selection = self.listbox_branches.curselection()
+        if not selection:
+            messagebox.showwarning("Advertencia", "Seleccione una rama primero.")
             return
-        branch = self.listbox_branches.get(selected[0])
-        success = self.bot_controller.checkout_branch(branch)
+        branch_name = self.listbox_branches.get(selection[0])
+        success = self.bot_controller.checkout_branch(branch_name)
         if success:
-            messagebox.showinfo("Éxito", f"Cambiado a la rama {branch}.")
+            messagebox.showinfo("Éxito", f"Cambiado a la rama {branch_name}")
             self.refresh_git_info()
         else:
-            messagebox.showerror("Error", f"No se pudo cambiar a la rama {branch}.")
+            messagebox.showerror("Error", f"No se pudo cambiar a la rama {branch_name}")
 
     def checkout_commit_sha(self):
-        commit_sha = self.entry_commit_sha.get().strip()
-        if not commit_sha:
-            messagebox.showwarning("Advertencia", "Ingrese un SHA de commit válido.")
+        sha = self.entry_commit_sha.get().strip()
+        if not sha:
+            messagebox.showwarning("Advertencia", "Ingrese un SHA válido.")
             return
-        success = self.bot_controller.checkout_commit(commit_sha)
+        success = self.bot_controller.checkout_commit(sha)
         if success:
-            messagebox.showinfo("Éxito", f"Cambiado al commit {commit_sha}.")
+            messagebox.showinfo("Éxito", f"Cambiado al commit {sha}")
             self.refresh_git_info()
         else:
-            messagebox.showerror("Error", f"No se pudo cambiar al commit {commit_sha}.")
+            messagebox.showerror("Error", f"No se pudo cambiar al commit {sha}")
 
 if __name__ == "__main__":
-    TOKEN = os.getenv("DISCORD_TOKEN")
-    if not TOKEN:
-        print("Falta definir la variable DISCORD_TOKEN en el entorno")
-    else:
-        app = App(TOKEN)
-        app.mainloop()
+    token = os.getenv("DISCORD_TOKEN")
+    if not token:
+        print("ERROR: No se encontró la variable de entorno TOKEN.")
+        sys.exit(1)
+
+    app = App(token)
+    app.mainloop()
