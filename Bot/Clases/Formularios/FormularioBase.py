@@ -5,6 +5,7 @@ Estado = Declaraciones.EstadoGlobal()
 
 
 class formularioBase(ui.Modal):
+    
     def __init__(self, title : str):
         super().__init__(title=title, timeout=5*60)
         
@@ -23,7 +24,3 @@ class formularioBase(ui.Modal):
     
     async def on_submit(self):
         pass
-
-        
-        
-        

@@ -6,7 +6,6 @@ from tkinter import ttk, PhotoImage, messagebox
 import logging
 import asyncio
 from dotenv import load_dotenv
-import subprocess
 import importlib
 
 def resource_path(relative_path):
@@ -23,7 +22,6 @@ except AttributeError:
     base_path = os.path.abspath(".")
 
 bot_path = os.path.join(base_path, "Bot")
-repo_path = os.path.abspath(os.path.join(bot_path, ".."))  # carpeta raíz con .git
 
 if bot_path not in sys.path:
     sys.path.insert(0, bot_path)
@@ -93,31 +91,12 @@ class BotController:
 
         def emit(self, record):
             msg = self.format(record)
-
             def append():
                 self.text_widget.configure(state='normal')
                 self.text_widget.insert(tk.END, msg + '\n')
                 self.text_widget.configure(state='disabled')
                 self.text_widget.yview(tk.END)
-
             self.text_widget.after(0, append)
-
-    def get_repo_path(self):
-        """
-        Devuelve la ruta absoluta a la carpeta raíz del repo (donde está .git),
-        que está un nivel arriba de la carpeta Bot.
-        En modo PyInstaller busca la ruta del ejecutable y sube.
-        """
-        if getattr(sys, "frozen", False):
-            exe_dir = os.path.dirname(sys.executable)
-            repo_dir = os.path.abspath(os.path.join(exe_dir, ".."))
-        else:
-            current_file_dir = os.path.dirname(os.path.abspath(__file__))
-            repo_dir = os.path.abspath(os.path.join(current_file_dir, "..", ".."))
-
-        if not os.path.isdir(os.path.join(repo_dir, ".git")):
-            print(f"Advertencia: No se encontró carpeta .git en {repo_dir}")
-        return repo_dir
 
     def start_bot(self):
         if self.is_starting or self.is_running:
@@ -166,112 +145,6 @@ class BotController:
             self.is_starting = False
             self.logger.info("Bot detenido.")
 
-    def check_for_updates(self):
-        repo = self.get_repo_path()
-        self.logger.info(f"Chequeando actualizaciones en repo: {repo}")
-        try:
-            output = subprocess.check_output(
-                ["git", "pull"],
-                stderr=subprocess.STDOUT,
-                cwd=repo
-            )
-            result = output.decode("utf-8")
-            if "Already up to date" not in result:
-                self.logger.info("Actualización detectada, reiniciando bot...")
-                self.stop_bot()
-                self.start_bot()
-            else:
-                self.logger.info("No hay actualizaciones nuevas.")
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"Error al verificar actualizaciones: {e.output.decode('utf-8')}")
-
-    def get_current_commit(self):
-        repo = self.get_repo_path()
-        try:
-            output = subprocess.check_output(
-                ["git", "rev-parse", "HEAD"],
-                cwd=repo,
-                stderr=subprocess.STDOUT
-            )
-            return output.decode("utf-8").strip()
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"Error obteniendo commit actual: {e.output.decode('utf-8')}")
-            return "Desconocido"
-
-    def get_current_branch(self):
-        repo = self.get_repo_path()
-        try:
-            output = subprocess.check_output(
-                ["git", "rev-parse", "--abbrev-ref", "HEAD"],
-                cwd=repo,
-                stderr=subprocess.STDOUT
-            )
-            return output.decode("utf-8").strip()
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"Error obteniendo branch actual: {e.output.decode('utf-8')}")
-            return "Desconocido"
-
-    def list_branches(self):
-        repo = self.get_repo_path()
-        try:
-            output = subprocess.check_output(
-                ["git", "branch", "--list"],
-                cwd=repo,
-                stderr=subprocess.STDOUT
-            )
-            branches = output.decode("utf-8").splitlines()
-            return [b.strip().replace("* ", "") for b in branches]
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"Error obteniendo lista de branches: {e.output.decode('utf-8')}")
-            return []
-
-    def checkout_branch(self, branch_name):
-        repo = self.get_repo_path()
-        try:
-            output = subprocess.check_output(
-                ["git", "checkout", branch_name],
-                cwd=repo,
-                stderr=subprocess.STDOUT
-            )
-            self.logger.info(f"Cambiado a la rama {branch_name}")
-            return True
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"Error cambiando a rama {branch_name}: {e.output.decode('utf-8')}")
-            return False
-
-    def checkout_commit(self, commit_sha):
-        repo = self.get_repo_path()
-        try:
-            output = subprocess.check_output(
-                ["git", "checkout", commit_sha],
-                cwd=repo,
-                stderr=subprocess.STDOUT
-            )
-            self.logger.info(f"Cambiado al commit {commit_sha}")
-            return True
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"Error cambiando a commit {commit_sha}: {e.output.decode('utf-8')}")
-            return False
-
-    def get_commit_details(self):
-        repo = self.get_repo_path()
-        try:
-            output = subprocess.check_output(
-                ["git", "show", "-s", "--format=%H%n%an%n%ad%n%s", "HEAD"],
-                cwd=repo,
-                stderr=subprocess.STDOUT,
-                text=True
-            )
-            lines = output.strip().split('\n')
-            if len(lines) >= 4:
-                commit_hash, author, date, message = lines[0], lines[1], lines[2], lines[3]
-                return f"Commit: {commit_hash}\nAutor: {author}\nFecha: {date}\nMensaje: {message}"
-            else:
-                return "Detalles del commit no disponibles."
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f"Error obteniendo detalles del commit: {e.output.decode('utf-8')}")
-            return "Error obteniendo detalles del commit."
-
 class App(tk.Tk):
     def __init__(self, token):
         super().__init__()
@@ -287,11 +160,9 @@ class App(tk.Tk):
 
         self.bot_frame = ttk.Frame(self.notebook)
         self.ui_frame = ttk.Frame(self.notebook)
-        self.git_frame = ttk.Frame(self.notebook)
 
         self.notebook.add(self.bot_frame, text="Control Bot")
         self.notebook.add(self.ui_frame, text="Offices")
-        self.notebook.add(self.git_frame, text="Git Repo")
 
         # Log text
         self.text_log = tk.Text(self.bot_frame, state='disabled', height=12)
@@ -307,13 +178,9 @@ class App(tk.Tk):
         self.btn_stop = tk.Button(frame_bot, text="Detener Bot", command=self.stop_bot)
         self.btn_stop.pack(side=tk.LEFT, padx=5)
 
-        self.btn_update = tk.Button(frame_bot, text="Actualizar Repo", command=self.update_repo)
-        self.btn_update.pack(side=tk.LEFT, padx=5)
-
         self.bot_controller = BotController(token, self.text_log)
 
         self.update_buttons_state()
-        self.after(1000, self.check_updates_loop)
 
         # Offices Treeview
         self.tree = ttk.Treeview(self.ui_frame, columns=("Id", "Creador"), show="headings", height=10)
@@ -359,42 +226,10 @@ class App(tk.Tk):
         self.update_offices_list()
         self.after(1000, self.update_offices_list)
 
-        # -- Pestaña Git --
-
-        self.label_commit = tk.Label(self.git_frame, text="Commit: cargando...")
-        self.label_commit.pack(anchor="w", padx=5, pady=5)
-
-        self.label_branch = tk.Label(self.git_frame, text="Branch: cargando...")
-        self.label_branch.pack(anchor="w", padx=5, pady=5)
-
-        self.text_commit_details = tk.Text(self.git_frame, height=5, state='disabled')
-        self.text_commit_details.pack(fill=tk.X, padx=5, pady=5)
-
-        self.branches_var = tk.StringVar(value=[])
-        self.listbox_branches = tk.Listbox(self.git_frame, listvariable=self.branches_var, height=10)
-        self.listbox_branches.pack(fill=tk.X, padx=5, pady=5)
-
-        self.btn_checkout_branch = tk.Button(self.git_frame, text="Cambiar a rama", command=self.checkout_selected_branch)
-        self.btn_checkout_branch.pack(pady=5)
-
-        # Campo y botón para checkout por commit
-        frame_commit = tk.Frame(self.git_frame)
-        frame_commit.pack(pady=10, fill=tk.X, padx=5)
-
-        tk.Label(frame_commit, text="Checkout por commit SHA:").pack(anchor="w")
-        self.entry_commit_sha = tk.Entry(frame_commit)
-        self.entry_commit_sha.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0,5))
-
-        self.btn_checkout_commit = tk.Button(frame_commit, text="Cambiar a commit", command=self.checkout_commit_sha)
-        self.btn_checkout_commit.pack(side=tk.LEFT)
-
-        self.refresh_git_info()
-
     def update_buttons_state(self):
         running = self.bot_controller.is_running or self.bot_controller.is_starting
         self.btn_start.config(state=tk.DISABLED if running else tk.NORMAL)
         self.btn_stop.config(state=tk.NORMAL if running else tk.DISABLED)
-        self.btn_update.config(state=tk.NORMAL)
         self.after(1000, self.update_buttons_state)
 
     def start_bot(self):
@@ -402,14 +237,6 @@ class App(tk.Tk):
 
     def stop_bot(self):
         threading.Thread(target=self.bot_controller.stop_bot, daemon=True).start()
-
-    def update_repo(self):
-        threading.Thread(target=self.bot_controller.check_for_updates, daemon=True).start()
-        self.after(2000, self.refresh_git_info)
-
-    def check_updates_loop(self):
-        self.bot_controller.check_for_updates()
-        self.after(60000, self.check_updates_loop)
 
     def update_offices_list(self):
         estado = EstadoGlobal()
@@ -469,48 +296,6 @@ class App(tk.Tk):
 
         for uid, est in estudiantes_dict.items():
             self.students_tree.insert("", "end", values=(est.IdUsuario, est.grupo, est.TiempoTotal, est.cumplimientoReal))
-
-    def refresh_git_info(self):
-        commit = self.bot_controller.get_current_commit()
-        branch = self.bot_controller.get_current_branch()
-        branches = self.bot_controller.list_branches()
-        details = self.bot_controller.get_commit_details()
-
-        self.label_commit.config(text=f"Commit: {commit}")
-        self.label_branch.config(text=f"Branch: {branch}")
-
-        self.text_commit_details.configure(state='normal')
-        self.text_commit_details.delete("1.0", tk.END)
-        self.text_commit_details.insert(tk.END, details)
-        self.text_commit_details.configure(state='disabled')
-
-        self.branches_var.set(branches)
-        self.after(60000, self.refresh_git_info)
-
-    def checkout_selected_branch(self):
-        selection = self.listbox_branches.curselection()
-        if not selection:
-            messagebox.showwarning("Advertencia", "Seleccione una rama primero.")
-            return
-        branch_name = self.listbox_branches.get(selection[0])
-        success = self.bot_controller.checkout_branch(branch_name)
-        if success:
-            messagebox.showinfo("Éxito", f"Cambiado a la rama {branch_name}")
-            self.refresh_git_info()
-        else:
-            messagebox.showerror("Error", f"No se pudo cambiar a la rama {branch_name}")
-
-    def checkout_commit_sha(self):
-        sha = self.entry_commit_sha.get().strip()
-        if not sha:
-            messagebox.showwarning("Advertencia", "Ingrese un SHA válido.")
-            return
-        success = self.bot_controller.checkout_commit(sha)
-        if success:
-            messagebox.showinfo("Éxito", f"Cambiado al commit {sha}")
-            self.refresh_git_info()
-        else:
-            messagebox.showerror("Error", f"No se pudo cambiar al commit {sha}")
 
 if __name__ == "__main__":
     token = os.getenv("DISCORD_TOKEN")
