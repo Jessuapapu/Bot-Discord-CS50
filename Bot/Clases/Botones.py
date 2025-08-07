@@ -1,10 +1,11 @@
 from discord import ButtonStyle, Interaction, ui
 from Declaraciones import Declaraciones
 from Clases import EstudianteClass
+from Clases.Formularios import FormuarioFormatoEstu
 
 Estado = Declaraciones.EstadoGlobal()
 
-class botonBase:
+class botonBase():
     def __init__(self, label: str, style: ButtonStyle):
         self.boton = ui.Button(label=label, style=style)
         self.boton.callback = self.callBack
@@ -56,3 +57,10 @@ class botonesEntrarOffices(botonBase):
 
     
 
+class botonesRegistro(ui.Button):
+    def __init__(self, label="Hola, registrate!!!", style=ButtonStyle.green):
+        super().__init__(label=label, style=style, custom_id="BotonRegistro")
+
+    async def callback(self, interaction: Interaction):
+        formulario = FormuarioFormatoEstu.FormularioFormato("Hola, registrate!!!!!")
+        await interaction.response.send_modal(formulario)

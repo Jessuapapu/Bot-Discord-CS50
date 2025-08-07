@@ -163,3 +163,7 @@ cython_debug/
 
 *.pdf
 secret.py
+
+
+#*.db
+*.db-journal

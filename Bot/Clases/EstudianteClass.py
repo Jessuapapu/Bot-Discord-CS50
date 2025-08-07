@@ -18,16 +18,16 @@ class Estudiante:
 
     def calcularCumplimieto(self):
         # Valida si ha estado al menos 20 minutos en la offices
-        if round(self.TiempoTotal/3600,1) >= 1.75:
+        if round(self.TiempoTotal / 3600,1) >= 1.75:
             self.cumplimientoReal = 2.0
         
-        elif round(self.TiempoTotal/3600,1) >= 1.3:
+        elif round(self.TiempoTotal / 3600,1) >= 1.3:
             self.cumplimientoReal = 1.5
         
-        elif round(self.TiempoTotal/3600,1) >= 0.75:
+        elif round(self.TiempoTotal / 3600,1) >= 0.75:
             self.cumplimientoReal = 1
             
-        elif round(self.TiempoTotal/3600,1) >= 0.3:
+        elif round(self.TiempoTotal / 3600,1) >= 0.3:
             self.cumplimientoReal = 0.5
                  
         else:
