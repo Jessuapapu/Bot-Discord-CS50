@@ -72,11 +72,15 @@ async def guardar(interaction: discord.Interaction, ID):
     tabla = util.CrearTabla(headerTabla,contenidoTabla,None)
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
 
+    lista_subida = [{"nombre": estu.Usuario.nick if estu.Usuario is not None else "No user (verificar bug)", "grupo": estu.grupo, "cumplimiento": estu.cumplimientoReal} for estu in Contents.Usuarios]
+    print(f"Lista de estudiantes a subir: {lista_subida}")
+
     if util.subir_office_sistema(
-        estudiantes=[user.IdUsuario for user in Contents.Usuarios],
+        estudiantes=lista_subida,
         fecha=datetime.datetime.now().strftime("%Y-%m-%d"),
         semana=Contents.bloque.split("-")[0].strip(),
-        turno=Contents.bloque.split("-")[1].strip()
+        turno=Contents.bloque.split("-")[1].strip(),
+        token=os.getenv("SYSTEM_API_KEY", "")
     ):
         await interaction.response.send_message("Offices guardada\nSe ha subido la asistencia al sistema correctamente", embed=embed, file=discord.File(ruta_pdf))
     else:

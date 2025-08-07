@@ -124,26 +124,32 @@ async def Pdfs_autocomplete(interaction: Interaction, current: str) -> List[Choi
 
     return resultados[:25]  #  permite máximo 25 opciones por autocomplete
 
-def subir_office_sistema(estudiantes: list, fecha: str, semana: str, turno: str) -> bool:
+def subir_office_sistema(estudiantes: List[dict], fecha: str, semana: str, turno: str, token: str) -> bool:
     try:
         if re.match(r'^\d{4}-\d{2}-\d{2}$', fecha) is None:
             raise ValueError("El formato de fecha no es correcto. Debe ser 'YYYY-MM-DD'.")
-
-        response = requests.post(
-            url=os.getenv("SYSTEM_API_ENDPOINT", ""),
-            data={
+        
+        data = {
                 "estudiantes": estudiantes,
                 "fechaBloque": fecha,
                 'semana': semana,
                 'turno': turno,
-                'token': os.getenv("SYSTEM_API_KEY")
+                'token': token
             }
+
+        response = requests.post(
+            url=os.getenv("SYSTEM_API_ENDPOINT", ""),
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            json=data
         )
 
         response.raise_for_status()
 
-        logs.Logs().add_log(f"Se subió una office al sistema, respuesta del sistema: {response.text}", level="INFO")
+        logs.Logs().add_log(f"Se subió una office al sistema, respuesta del sistema: {response.content.decode()}", level="INFO")
         return True
-    except Exception as e:
-        logs.Logs().add_log(f"Error al subir la office al sistema, respuesta del sistema: {e}", level="ERROR")
+    except requests.HTTPError as e:
+        logs.Logs().add_log(f"Error al subir la office al sistema, respuesta del sistema: {e} - {e.response.content.decode()}", level="ERROR")
         return False
