@@ -3,7 +3,7 @@ import discord
 from Declaraciones import Declaraciones
 import os
 import datetime
-
+import requests
 
 Estado = Declaraciones.EstadoGlobal()
 
@@ -18,6 +18,10 @@ from Clases import util
 async def guardar(interaction: discord.Interaction, ID):
 
     Contents = Estado.getOffices(ID)
+
+    if Contents is None:
+        await interaction.response.send_message("No se encontró la office con ese ID.")
+        return
 
     if Contents.Estado != 0:
         await interaction.response.send_message("No se ha finalizado la offices.")
@@ -55,8 +59,8 @@ async def guardar(interaction: discord.Interaction, ID):
     with open(ruta_pdf, "w+b") as resultado:
         pisa_status = pisa.CreatePDF(html_renderizado, dest=resultado)
 
-    if pisa_status.err:
-        await interaction.response.send_message.send("Error al generar el PDF.")
+    if pisa_status is None:
+        await interaction.response.send_message("Error al generar el PDF.")
         return
 
     headerTabla = ["Nombre", "Grupo", "Tiempo", "votos"]
@@ -68,6 +72,15 @@ async def guardar(interaction: discord.Interaction, ID):
     tabla = util.CrearTabla(headerTabla,contenidoTabla,None)
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
 
+    if util.subir_office_sistema(
+        estudiantes=[user.IdUsuario for user in Contents.Usuarios],
+        fecha=datetime.datetime.now().strftime("%Y-%m-%d"),
+        semana=Contents.bloque.split("-")[0].strip(),
+        turno=Contents.bloque.split("-")[1].strip()
+    ):
+        await interaction.response.send_message("Offices guardada\nSe ha subido la asistencia al sistema correctamente", embed=embed, file=discord.File(ruta_pdf))
+    else:
+        await interaction.response.send_message("Offices guardada, SE HAN DETECTADO ERRORES\nERROR: No se ha podido subir la asistencia al sistema", embed=embed, file=discord.File(ruta_pdf))
+
     del Estado.OfficesRevision[ID]
-    await interaction.response.send_message(embed=embed, file=discord.File(ruta_pdf))
     return

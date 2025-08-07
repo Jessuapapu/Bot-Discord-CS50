@@ -1,5 +1,7 @@
 
+from asyncio.windows_events import NULL
 import os
+from urllib import response
 
 from discord.app_commands import Choice
 from discord import Interaction, Embed, ui, Color
@@ -7,6 +9,9 @@ from discord import Interaction, Embed, ui, Color
 from typing import List
 from Declaraciones import Declaraciones
 from table2ascii import table2ascii as t2a
+import requests
+import re
+from . import logs
 
 
 Estado = Declaraciones.EstadoGlobal()
@@ -118,3 +123,27 @@ async def Pdfs_autocomplete(interaction: Interaction, current: str) -> List[Choi
     ]
 
     return resultados[:25]  #  permite máximo 25 opciones por autocomplete
+
+def subir_office_sistema(estudiantes: list, fecha: str, semana: str, turno: str) -> bool:
+    try:
+        if re.match(r'^\d{4}-\d{2}-\d{2}$', fecha) is None:
+            raise ValueError("El formato de fecha no es correcto. Debe ser 'YYYY-MM-DD'.")
+
+        response = requests.post(
+            url=os.getenv("SYSTEM_API_ENDPOINT", ""),
+            data={
+                "estudiantes": estudiantes,
+                "fechaBloque": fecha,
+                'semana': semana,
+                'turno': turno,
+                'token': os.getenv("SYSTEM_API_KEY")
+            }
+        )
+
+        response.raise_for_status()
+
+        logs.Logs().add_log(f"Se subió una office al sistema, respuesta del sistema: {response.text}", level="INFO")
+        return True
+    except Exception as e:
+        logs.Logs().add_log(f"Error al subir la office al sistema, respuesta del sistema: {e}", level="ERROR")
+        return False
