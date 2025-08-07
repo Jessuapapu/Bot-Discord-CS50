@@ -128,14 +128,16 @@ def subir_office_sistema(estudiantes: List[dict], fecha: str, semana: str, turno
     try:
         if re.match(r'^\d{4}-\d{2}-\d{2}$', fecha) is None:
             raise ValueError("El formato de fecha no es correcto. Debe ser 'YYYY-MM-DD'.")
+
+        # TODO: Validaciones de la parte del sistema (de manera global)
         
         data = {
-                "estudiantes": estudiantes,
-                "fechaBloque": fecha,
-                'semana': semana,
-                'turno': turno,
-                'token': token
-            }
+            "estudiantes": estudiantes,
+            "fechaBloque": fecha,
+            'semana': semana,
+            'turno': turno,
+            'token': token
+        }
 
         response = requests.post(
             url=os.getenv("SYSTEM_API_ENDPOINT", ""),

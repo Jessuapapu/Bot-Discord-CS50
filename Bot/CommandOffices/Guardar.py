@@ -73,9 +73,8 @@ async def guardar(interaction: discord.Interaction, ID):
     embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"```\n{tabla}\n```", discord.Color.dark_gold())
 
     lista_subida = [{"nombre": estu.Usuario.nick if estu.Usuario is not None else "No user (verificar bug)", "grupo": estu.grupo, "cumplimiento": estu.cumplimientoReal} for estu in Contents.Usuarios]
-    print(f"Lista de estudiantes a subir: {lista_subida}")
 
-    if util.subir_office_sistema(
+    if util.subir_office_sistema (
         estudiantes=lista_subida,
         fecha=datetime.datetime.now().strftime("%Y-%m-%d"),
         semana=Contents.bloque.split("-")[0].strip(),
