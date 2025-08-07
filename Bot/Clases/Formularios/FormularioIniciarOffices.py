@@ -20,9 +20,8 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
         self.CanalDeVoz = CanalDeVoz
         
         self.informacion = self.obtenerId()
-        self.InputIDOffices = self.IniciarInput("Ingrese el Id (ojo con el fomrato)!!", "Ejem: 1-S03-Martes–10-12", f"Sem-{self.informacion['Dia']}-{self.informacion['Bloque']}", True)
-        
-        self.InputBloque = self.IniciarInput(f"Ingrese el bloque: ", "Ejem: 8-10, 1-3", f"{self.informacion["Bloque"]}", True)
+        self.InputIDOffices = self.IniciarInput("Ingrese el Id (ojo con el fomrato)!!", "Ejem: 1-S03-Martes ", f"Sem-{self.informacion['Dia']}", True)
+        self.InputBloque = self.IniciarInput(f"Ingrese el bloque: ", "Ejem: 8-10, 1-3", f"{self.informacion['Bloque']}", True)
         self.InputStaff = self.IniciarInput("Ingrese los codigos del staff","Ejem: pcastillo, dknauth, ecalix, bgarcia", " ")
                            
         self.add_item(self.InputIDOffices)
@@ -32,7 +31,7 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
             
     def obtenerId(self):
         informacion = {}
-        dias_semana = ["lun", "mar", "mie", "jue", "vie", "sab", "dom"]
+        dias_semana = ["lun", "mar", "mie", "jue", "vie", "sab"]
 
         # Obtener la hora actual en zona Nicaragua
         ahora = datetime.now(ZoneInfo("America/Managua"))
@@ -46,24 +45,25 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
         hora_mas_dos_24 = (hora_actual_24 + 2) % 24
         hora_fin = hora_mas_dos_24 % 12 or 12
 
-        am_pm = "am" if hora_mas_dos_24 < 12 else "pm"
+        # am_pm = "am" if hora_mas_dos_24 < 12 else "pm"
 
-        bloque = f"{hora_inicio}-{hora_fin}{am_pm}"
+        # bloque = f"{hora_inicio}-{hora_fin}{am_pm}"
+        bloque = f"{hora_inicio}-{hora_fin}"
         informacion["Bloque"] = bloque
 
         return informacion
 
     async def on_submit(self,interaction:Interaction):
         
-        if not self.es_formato_valido(self.InputIDOffices.value, r"^\d+-(S|s)\d{2}-(lun(?:es)?|mar(?:tes)?|mie(?:rcoles)?|jue(?:ves)?|vie(?:rnes)?|sab(?:ado)?|dom(?:ingo)?)[–-](\d{1,2})-(\d{1,2})\s*([aApP][mM])$"):
-            await interaction.response.send_message(f"Formato de semana no valido \n Id de Offices sugerida: Sem-{self.informacion['Dia']}-{self.informacion['Bloque']}",ephemeral = True)
+        if not self.es_formato_valido(self.InputIDOffices.value, r"^\d+-(S|s)\d{2}-(lun(?:es)?|mar(?:tes)?|mie(?:rcoles)?|jue(?:ves)?|vie(?:rnes)?|sab(?:ado)?|dom(?:ingo)?)$"):
+            await interaction.response.send_message(f"Formato de semana no valido \n Id de Offices sugerida: Sem-{self.informacion['Dia']}",ephemeral = True)
             return
         
-        if self.InputBloque == " " or not self.es_formato_valido(self.InputBloque.value, r"\b(\d{1,2})-(\d{1,2})\s*([aApP][mM])?\b"):
+        if self.InputBloque == " " or not self.es_formato_valido(self.InputBloque.value, r"\b(\d{1,2})-(\d{1,2})\b"):
             await interaction.response.send_message(f"Ingrese un bloque Valido \n Bloque sugerido: {self.informacion['Bloque']}",ephemeral=True)
             return
         
-        ID = self.InputIDOffices.value
+        ID = f"{self.InputIDOffices.value}-{self.InputBloque.value}"
         Bloque = self.InputBloque.value
         
         miembros = [
@@ -82,7 +82,7 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
         staff = self.InputStaff.value.replace(' ','').split(',') if self.InputStaff.value != "" else []
         
         Office = Offices(ID, interaction.user.display_name[8:], miembros, Bloque, self.CanalDeVoz, staff)
-        Estado.CanalesDeVoz[self.CanalDeVoz.id] = ID
+        Estado.CanalesDeVoz[str(self.CanalDeVoz.id)] = ID
         Estado.OfficesLista[ID] = Office
         await Office.Barrido50()
         

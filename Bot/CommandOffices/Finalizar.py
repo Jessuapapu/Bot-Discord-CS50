@@ -25,7 +25,7 @@ async def finalizar(interaction: discord.Interaction, ID):
     Office.Estado = 0
     
     del Estado.OfficesLista[ID]
-    del Estado.CanalesDeVoz[Office.canal.id]
+    del Estado.CanalesDeVoz[str(Office.canal.id)]
     Estado.OfficesRevision[ID] = Office 
 
     tabla = util.CrearTabla(headerTabla,contenidoTabla,None)
