@@ -2,6 +2,7 @@
 from discord import Member
 from Clases import EstudianteClass, OfficeClass
 
+
 class EstadoGlobal:
     """ 
         OfficesLista -> { str(Id): Offices }, Es la estructura la cual guarda las offices que estan activas
@@ -26,6 +27,7 @@ class EstadoGlobal:
         
         #[ Lista de roles que se excluyen o se aceptan en el servidor cs|web ]
         self.ListaDeRolesPermitidos: list[str] = ["Staff", "Admin", "Admin Staff", "Profesor", "staff", "Bot", "Bots"] 
+        self.ListaDeRolesPermitidosAdmin: list[str] = ["Admin", "Admin Staff", "Profesor"]
         
     def getKeyCanalesDeVoz(self) -> list:
         """ Retorna Todas la key de los canales de voz """
@@ -89,4 +91,4 @@ class EstadoGlobal:
         
         # Caso base de que si XD
         return None
-        
+    

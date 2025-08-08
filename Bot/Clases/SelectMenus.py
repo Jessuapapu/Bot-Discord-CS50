@@ -1,8 +1,8 @@
 import discord
 from Formularios import FormularioBase
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 # Clase En desuso
 # class SelectEstudianteView(discord.ui.View):

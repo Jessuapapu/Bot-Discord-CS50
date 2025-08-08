@@ -1,6 +1,6 @@
 import discord
-from Declaraciones import Declaraciones
-Estado = Declaraciones.EstadoGlobal()
+from Declaraciones import EstadoGlobal
+Estado = EstadoGlobal.EstadoGlobal()
 
 
 async def Mover(interaction: discord.Interaction, canal_destino: discord.VoiceChannel, otro_miembro: discord.Member):

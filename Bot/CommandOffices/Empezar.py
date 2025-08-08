@@ -1,9 +1,9 @@
 
 import discord
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 
 from Clases.Formularios import FormularioIniciarOffices
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 async def empezar(interaction: discord.Interaction, CanalDeVoz: discord.VoiceChannel):
 

@@ -1,8 +1,8 @@
 import discord
-from Declaraciones import Declaraciones
-from Bot.Clases.Formularios import FormularioBase
+from Declaraciones import EstadoGlobal
+from Clases.Formularios import FormularioBase
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 
 async def borrar(Interaction: discord.Interaction, IdOffices, Estudiante:discord.Member):

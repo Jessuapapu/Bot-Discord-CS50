@@ -1,8 +1,8 @@
 import functools
 from discord import Interaction
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 
 def valida_id_office():
@@ -49,6 +49,27 @@ def valida_roles():
 
             # Validamos si tiene alguno de los roles permitidos
             if not any(rol in Estado.ListaDeRolesPermitidos for rol in AutorRoles):
+                await interaction.response.send_message(
+                    "❌ No tienes los permisos requeridos.",
+                    ephemeral=True
+                )
+                return
+
+            # Llamamos a la función original
+            return await func(self, interaction, *args, **kwargs)
+        return wrapper
+    return decorator
+
+
+def valida_roles_admin():
+    def decorator(func):
+        @functools.wraps(func)
+        async def wrapper(self, interaction: Interaction, *args, **kwargs):
+            # Obtenemos todos los nombres de roles del usuario
+            AutorRoles = [rol.name for rol in interaction.user.roles]
+
+            # Validamos si tiene alguno de los roles permitidos
+            if not any(rol in Estado.ListaDeRolesPermitidosAdmin for rol in AutorRoles):
                 await interaction.response.send_message(
                     "❌ No tienes los permisos requeridos.",
                     ephemeral=True

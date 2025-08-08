@@ -1,9 +1,9 @@
 from Clases.Formularios import FormularioBase
 from Clases.util import CrearMensajeEmbed
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 from discord import Interaction
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 class formularioEditarOffices(FormularioBase.formularioBase):
     def __init__(self, title, IDOffices):

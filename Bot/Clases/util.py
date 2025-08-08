@@ -5,11 +5,11 @@ from discord.app_commands import Choice
 from discord import Interaction, Embed, ui, Color
 
 from typing import List
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 from table2ascii import table2ascii as t2a
 
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 """ 
 

@@ -1,8 +1,8 @@
 import discord
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 from Clases.Formularios import FomularioAgregarEstu
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 async def agregarEstuOffices(interaction: discord.Interaction, IDOffices, Estudiante: discord.Member):
     

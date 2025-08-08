@@ -1,9 +1,10 @@
 
 import discord
-from Declaraciones import Declaraciones
-from Clases import util, Botones
+from Clases.Botones import BotonBase
+from Declaraciones import EstadoGlobal
+from Clases import util
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 async def votacion(interaction:discord.Interaction,ID,tiempo):
    """
@@ -20,7 +21,7 @@ async def votacion(interaction:discord.Interaction,ID,tiempo):
    await interaction.response.send_message(message, view=view, ephemeral=False)
    """
    
-   botones = [Botones.botonesAsistencia("Estoy Presente!",discord.ButtonStyle.success,ID)]
+   botones = [BotonBase.botonesAsistencia("Estoy Presente!",discord.ButtonStyle.success,ID)]
    offices = Estado.OfficesLista[ID]
    offices.iniciarContadorDeVotos()
    view = util.CrearEncuestaSimple(botones,tiempo)

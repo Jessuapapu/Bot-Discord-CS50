@@ -1,11 +1,11 @@
 
 import discord
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 import os
 import datetime
 
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 # Librerias para generar los PDFs -------------------------
 #   Jinja La que genera el html a partir de una plantilla

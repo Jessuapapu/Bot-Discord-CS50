@@ -1,7 +1,7 @@
 import discord
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 from Clases import util
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 
 async def ListaOffices(interaction:discord.Interaction):

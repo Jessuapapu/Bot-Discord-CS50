@@ -1,7 +1,6 @@
 from discord import ui
-from Declaraciones import Declaraciones
 from re import match, IGNORECASE
-Estado = Declaraciones.EstadoGlobal()
+
 
 
 class formularioBase(ui.Modal):

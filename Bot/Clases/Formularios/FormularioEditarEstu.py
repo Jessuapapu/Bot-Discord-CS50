@@ -1,8 +1,8 @@
 from Clases.Formularios import FormularioBase
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 from discord import Member, Interaction
 from Clases import EstudianteClass
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 class formularioEditarEstu(FormularioBase.formularioBase):
 

@@ -1,8 +1,8 @@
 import discord
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 import random
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 async def ruletita(interaction:discord.Interaction, CanalDeVoz: discord.VoiceChannel):
     

@@ -3,9 +3,10 @@ from discord.ext import commands
 import re
 import time
 
-from Declaraciones import Declaraciones
-from Clases import util, Botones
-Estado = Declaraciones.EstadoGlobal()
+from Clases.Botones import BotonBase
+from Declaraciones import EstadoGlobal
+from Clases import util
+Estado = EstadoGlobal.EstadoGlobal()
 
 
 
@@ -89,7 +90,7 @@ class Eventos(commands.Cog):
             else:
                 # NO está registrado, enviar botón de confirmación):
                 Offices = Estado.OfficesLista[Estado.CanalesDeVoz[after.channel.id]]
-                view = util.CrearEncuestaSimple([Botones.botonesEntrarOffices("Entrar a offices!!!!", discord.ButtonStyle.green, Offices.Id, member)], (10 * 60))
+                view = util.CrearEncuestaSimple([BotonBase.botonesEntrarOffices("Entrar a offices!!!!", discord.ButtonStyle.green, Offices.Id, member)], (10 * 60))
                 
                 embed = util.CrearMensajeEmbed("¡¡¡¡¡¡¡¡Ingresar a la offices!!!!!!!",f"Hola {user_id}, ¿deseas unirte a la offices?, Recuerda siempre de aceptar la invitacion para tomar en cuenta tu asistencia :) \n\n si no te la envio es porque ya estas registado jeje", discord.Color.random())
                 try:

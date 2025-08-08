@@ -4,14 +4,14 @@ from Clases.OfficeClass import Offices
 from Clases.EstudianteClass import Estudiante
 from zoneinfo import ZoneInfo
 
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 import datetime
 from datetime import datetime
 
 
 from discord import Interaction, VoiceChannel
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 class FormularioIniciarOffices(FormularioBase.formularioBase):
     def __init__(self, title, CanalDeVoz: VoiceChannel):

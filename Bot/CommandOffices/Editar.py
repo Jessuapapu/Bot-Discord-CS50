@@ -1,8 +1,8 @@
 import discord
 from Clases.Formularios import FormularioEditarEstu, FormularioEditarOffices
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 async def EditarEstudiante(interaction: discord.Interaction, IDOffices, Estudiante: discord.Member):
     Estudiante = Estado.getEstudiante(Estudiante,IDOffices)

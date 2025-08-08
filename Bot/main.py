@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
-import os
+import os, asyncio
 from dotenv import load_dotenv
 import webserver
-from Clases import Botones
+from Declaraciones.views import viewsPersistentes
 # Cargamos el .env
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -14,11 +14,6 @@ intents.message_content = True
 intents.members = True
 intents.voice_states = True
 
-async def vistaPersistente():
-    view = discord.ui.View(timeout = None)
-    boton = Botones.botonesRegistro()
-    view.add_item(boton)
-    return view
 
 # Definimos el bot extendiendo Bot para usar setup_hook
 class MyBot(commands.Bot):
@@ -28,22 +23,18 @@ class MyBot(commands.Bot):
     async def setup_hook(self):
         await self.load_extension("cogs.Offices")
         await self.load_extension("cogs.Eventos")
+        await self.load_extension("cogs.Moderacion")
         await self.tree.sync()
         
-        # forma de añadir una vista persistente
-        # vista persistente
-        vista = await vistaPersistente()
-        self.add_view(vista)
+        
+        # vistasPersistentes
+        VPS = await viewsPersistentes()
+        
+        self.add_view(VPS.vistaRegistro)
 
 
 bot = MyBot()
 
-# Comando para poder mandar el msj con la vista persistente 
-@bot.command()
-async def botonRegistro(ctx):
-    vista = await vistaPersistente()
-    await ctx.send("Si",view=vista)
-      
 
 # Finalmente arrancamos el bot
 # webserver.keep_alive()

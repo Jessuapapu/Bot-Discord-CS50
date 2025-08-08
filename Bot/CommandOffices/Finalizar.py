@@ -1,8 +1,8 @@
 import discord
-from Declaraciones import Declaraciones
+from Declaraciones import EstadoGlobal
 
 from Clases import util
-Estado = Declaraciones.EstadoGlobal()
+Estado = EstadoGlobal.EstadoGlobal()
 
 async def finalizar(interaction: discord.Interaction, ID):
     if len(Estado.OfficesLista) == 0 or not Estado.OfficesLista.get(ID,None) or Estado.OfficesLista[ID].Estado == 0:
