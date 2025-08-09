@@ -168,5 +168,5 @@ cython_debug/
 secret.py
 
 
-#*.db
+*.db
 *.db-journal
