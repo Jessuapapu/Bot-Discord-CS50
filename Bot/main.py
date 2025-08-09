@@ -6,7 +6,7 @@ import webserver
 from Declaraciones.views import viewsPersistentes
 # Cargamos el .env
 load_dotenv()
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN", "")
 
 # Permisos de Intents
 intents = discord.Intents.default()
