@@ -225,6 +225,8 @@ class App(tk.Tk):
 
         self.update_offices_list()
         self.after(1000, self.update_offices_list)
+        
+        self.start_bot()
 
     def update_buttons_state(self):
         running = self.bot_controller.is_running or self.bot_controller.is_starting
