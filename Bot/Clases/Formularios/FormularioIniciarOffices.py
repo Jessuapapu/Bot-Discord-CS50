@@ -31,7 +31,7 @@ class FormularioIniciarOffices(FormularioBase.formularioBase):
             
     def obtenerId(self):
         informacion = {}
-        dias_semana = ["lun", "mar", "mie", "jue", "vie", "sab"]
+        dias_semana = ["lun", "mar", "mie", "jue", "vie", "sab","dom"]
 
         # Obtener la hora actual en zona Nicaragua
         ahora = datetime.now(ZoneInfo("America/Managua"))

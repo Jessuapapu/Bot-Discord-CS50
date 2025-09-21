@@ -29,6 +29,8 @@ class EstadoGlobal:
         self.ListaDeRolesPermitidos: list[str] = ["Staff", "Admin", "Admin Staff", "Profesor", "staff", "Bot", "Bots"] 
         self.ListaDeRolesPermitidosAdmin: list[str] = ["Admin", "Admin Staff", "Profesor"]
         
+        self.OfficesLista["Prueba"] = OfficeClass.Offices("Prueba","Jessua",[],"10","")
+        
     def getKeyCanalesDeVoz(self) -> list:
         """ Retorna Todas la key de los canales de voz """
         return list(self.CanalesDeVoz.keys())
@@ -59,6 +61,8 @@ class EstadoGlobal:
         lista += list(self.OfficesRevision.values())
         return lista
     
+    def getOfficesListaValues(self) ->list:
+        return list(self.OfficesLista.values())
     
     def getEstudiante(self, Estudiante: Member | str, Id) -> EstudianteClass.Estudiante | None:
         """ Metodo para retornar un estudiante directo de la offices """

@@ -170,3 +170,5 @@ secret.py
 
 *.db
 *.db-journal
+
+**/node_modules/

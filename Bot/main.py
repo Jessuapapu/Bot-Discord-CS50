@@ -1,21 +1,21 @@
+# main.py
 import discord
 from discord.ext import commands
 import os, asyncio
 from dotenv import load_dotenv
-import webserver
+import threading
+from webserver import app
 from Declaraciones.views import viewsPersistentes
-# Cargamos el .env
+from Declaraciones.EstadoGlobal import EstadoGlobal
+
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN", "")
 
-# Permisos de Intents
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 intents.voice_states = True
 
-
-# Definimos el bot extendiendo Bot para usar setup_hook
 class MyBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="$", intents=intents)
@@ -25,17 +25,17 @@ class MyBot(commands.Bot):
         await self.load_extension("cogs.Eventos")
         await self.load_extension("cogs.Moderacion")
         await self.tree.sync()
-        
-        
-        # vistasPersistentes
         VPS = await viewsPersistentes()
-        
         self.add_view(VPS.vistaRegistro)
-
 
 bot = MyBot()
 
+def run_bot():
+    bot.run(TOKEN)
 
-# Finalmente arrancamos el bot
-# webserver.keep_alive()
-bot.run(TOKEN)
+if __name__ == "__main__":
+    # Iniciamos el bot en segundo plano
+    threading.Thread(target=run_bot, daemon=True).start()
+    
+    # Flask en el hilo principal → permite recarga automática
+    app.run(host="0.0.0.0", port=10000, debug=True)
