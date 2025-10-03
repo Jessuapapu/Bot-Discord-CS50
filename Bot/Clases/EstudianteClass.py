@@ -78,4 +78,13 @@ class Estudiante:
         return hash(self.IdDiscord)
 
         
-        
+    def to_dict(self):
+        return {
+            "IdUsuario": self.IdUsuario,
+            "IdDiscord": self.IdDiscord,
+            "grupo": self.grupo,
+            "IdOffice": self.IdOffice,
+            "TiempoTotal": self.TiempoTotal,
+            "cumplimientoReal": self.cumplimientoReal,
+            "avatar": self.Usuario.avatar.url
+        }

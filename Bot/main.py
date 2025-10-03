@@ -1,12 +1,21 @@
 # main.py
 import discord
 from discord.ext import commands
-import os, asyncio
+import sys, os
+
 from dotenv import load_dotenv
 import threading
-from webserver import app
 from Declaraciones.views import viewsPersistentes
+
+# singleton.py
 from Declaraciones.EstadoGlobal import EstadoGlobal
+
+# Instancia única de EstadoGlobal que se comparte en todo el proyecto
+EG = EstadoGlobal()
+
+# importar el serverweb
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from WebserverApp import webserver
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN", "")
@@ -36,6 +45,5 @@ def run_bot():
 if __name__ == "__main__":
     # Iniciamos el bot en segundo plano
     threading.Thread(target=run_bot, daemon=True).start()
-    
-    # Flask en el hilo principal → permite recarga automática
-    app.run(host="0.0.0.0", port=10000, debug=True)
+
+    webserver.socketio.run(app=webserver.app,host="0.0.0.0", port=10000)

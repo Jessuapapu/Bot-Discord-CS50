@@ -37,13 +37,12 @@ class Offices:
         setStaff(Nombres: list[str]):
             Asigna la lista de nombres del staff a la office.
    """
-    def __init__(self, Id, IdUsuario, Usuarios: list[Estudiante], bloque, CanalVoz: VoiceChannel, Staff: list = []):
-        hora = datetime.datetime.now()
+    def __init__(self, Id, IdUsuario, Usuarios: list[Estudiante], bloque, CanalVoz: VoiceChannel | None, Staff: list = []):
         
         # Informacion de la offices
         self.Id = Id
         self.IdUsuario = IdUsuario
-        self.HoraCreacion = hora.strftime("%H:%M")
+        self.HoraCreacion = datetime.datetime.now().strftime("%H:%M")
         self.bloque = bloque
         self.canal = CanalVoz
         
@@ -135,3 +134,14 @@ class Offices:
     def setStaff(self,Nombres:list[str]):
         self.NombresStaff = Nombres
         return
+    
+    def to_dict(self):
+        return {
+            "Id": self.Id,
+            "IdUsuario": self.IdUsuario,
+            "HoraCreacion": self.HoraCreacion,
+            "bloque": self.bloque,
+            "canal": self.canal.name if self.canal else None,
+            "staff": self.NombresStaff,
+            "Usuarios": [u.to_dict() for u in self.Usuarios], 
+        }

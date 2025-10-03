@@ -12,7 +12,5 @@ async def borrar(Interaction: discord.Interaction, IdOffices, Estudiante:discord
         await Interaction.response.send_message("El Estudiante no esta registrado en esas offices",ephemeral=True)
         return
     
-    
-    
-    await Interaction.response.send_message("Estudiante eliminado correctamnete >:)", ephemeral=True)
+    await Interaction.response.send_message("Estudiante eliminado correctamente >:)", ephemeral=True)
     return

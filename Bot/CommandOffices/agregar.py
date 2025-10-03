@@ -15,7 +15,6 @@ async def agregarEstuOffices(interaction: discord.Interaction, IDOffices, Estudi
     
     CanalDeVoz = Estudiante.voice.channel if Estudiante.voice else None
     
-    
     # Valida si esta conectado o si esta en un canal con una offices
     if not CanalDeVoz or CanalDeVoz.id not in Estado.getKeyCanalesDeVoz():
         await interaction.response.send_message("El estudiante no esta en un canal de voz o no esta conectado a una offices :(",ephemeral=True)
