@@ -74,27 +74,12 @@ class EstadoGlobal:
         if not office:
             # Si no encuentra la offices retorna None
             return None
-        
-        if type(Estudiante) == str:
-            for User in office.Usuarios:
-                
-                # Valida por el Nombre (IdUsuario)
-                if User.IdUsuario == Estudiante:
-                    return User
-            # Si no lo encuentra Retorna None
-            return None
-        
-        if type(Estudiante) ==  Member:
-            for User in office.Usuarios:
-                
-                # Valida por el id de discord
-                if Estudiante.id == User.IdDiscord:
-                    return User
-                
-            # Si no lo encuentra Retorna None
-            return None
-        
-        # Caso base de que si XD
+
+        for User in office.Usuarios:  
+            # Valida por el Nombre (IdUsuario) o por Id de discord
+            if User.IdUsuario or User.IdDiscord == Estudiante if type(Estudiante == str) else Estudiante.id:
+                return User
+            
         return None
     
 estado_global = EstadoGlobal()

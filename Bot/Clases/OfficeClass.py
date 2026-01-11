@@ -77,10 +77,12 @@ class Offices:
             
         return ListaDeVotos
      
-     # Creo que se puede refactorizar mejor esto       
+    # Creo que se puede refactorizar mejor esto       
+    # La clase
     def getEstudiantes(self):
-        return [user.IdUsuario for user in self.Usuarios]
+        return [user for user in self.Usuarios]
     
+    # Nombres 
     def getNombreEstudiantes(self):
         return [user.IdUsuario for user in self.Usuarios]
     

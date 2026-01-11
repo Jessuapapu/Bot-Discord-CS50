@@ -1,24 +1,16 @@
 from Clases.Formularios import FormularioBase
 from Clases.util import CrearMensajeEmbed
-from Declaraciones import EstadoGlobal
+
 from discord import Interaction
 
-Estado = EstadoGlobal.EstadoGlobal()
 
 class formularioEditarOffices(FormularioBase.formularioBase):
     def __init__(self, title, IDOffices):
-        super().__init__(title=title[:45])
-        self.IDOffices = IDOffices
-        self.Offices = Estado.getOffices(IDOffices)
-        
-        # # Tiene que entrar en uno
-        # if self.IDOffices in Estado.getKeyOfficesLista():
-        #     self.Offices = Estado.OfficesLista[self.IDOffices]
-        # else:
-        #     self.Offices = Estado.OfficesRevision[self.IDOffices]
+        super().__init__(title=title[:45], IdOffices= IDOffices)
             
-        self.InputIdOffices = self.IniciarInput(f"Id: {self.IDOffices}", f"{self.IDOffices}", f"{self.IDOffices}",True)
-        self.InputBloque = self.IniciarInput(f"Bloque de la offices : {self.Offices.bloque}", f"formato aceptado 10-12, 1-3, 3-5", f"{self.Offices.bloque}",True)
+        self.InputIdOffices = self.IniciarInput(f"Id: {self.IdOffices}", f"{self.IdOffices}", f"{self.IdOffices}",True)
+        self.InputBloque.label = f"Bloque de la offices : {self.Offices.bloque}" 
+        self.InputBloque.default = f"{self.Offices.bloque}"
         
         nombres = " "
         if self.Offices.NombresStaff is not []:
@@ -30,7 +22,8 @@ class formularioEditarOffices(FormularioBase.formularioBase):
         else:
             nombres = ""               
                 
-        self.InputStaff = self.IniciarInput(f"Staff {nombres}","Ejem: pcastillo, dknauth, akelly, bgarcia",nombres, True)
+        self.InputStaff.label = f"Staff {nombres}"
+        
         self.add_item(self.InputIdOffices)
         self.add_item(self.InputBloque) 
         self.add_item(self.InputStaff)
@@ -44,7 +37,7 @@ class formularioEditarOffices(FormularioBase.formularioBase):
             return
         
         
-        if self.InputIdOffices.value in Estado.getKeyOfficesLista() + Estado.getKeyCanalesDeVoz() and not self.IDOffices:
+        if self.InputIdOffices.value in self.SIG.getKeyOfficesLista() + self.SIG.getKeyCanalesDeVoz() and not self.IDOffices:
             await interaction.response.send_message("Ya existe una offices con ese nombre",ephemeral=True)
         
         anteriorBloque = self.Offices.bloque
@@ -53,9 +46,9 @@ class formularioEditarOffices(FormularioBase.formularioBase):
         
         
         try:
-            del Estado.OfficesLista[self.IDOffices]
+            del self.SIG.OfficesLista[self.IDOffices]
         except:
-            del Estado.OfficesRevision[self.IDOffices]
+            del self.SIG.OfficesRevision[self.IDOffices]
             
             
         self.Offices.Id = self.InputIdOffices.value
@@ -63,11 +56,11 @@ class formularioEditarOffices(FormularioBase.formularioBase):
         self.Offices.NombresStaff = self.InputStaff.value.replace(' ','').split(',') if self.InputStaff.value != " " else []
         
         if self.Offices.Estado == 0:
-            Estado.OfficesRevision[self.Offices.Id] = self.Offices
+            self.SIG.OfficesRevision[self.Offices.Id] = self.Offices
         elif self.Offices.Estado == 1:
-            Estado.OfficesLista[self.Offices.Id] = self.Offices
+            self.SIG.OfficesLista[self.Offices.Id] = self.Offices
         
-        """ Encontrar diferencias entre los codigos de staffs
+        """  Encontrar diferencias entre los codigos de staffs
         psdt: A LO UNICO QUE LE PUSE ATENCION A MATEMATICAS DISCRETAS FUE A CONJUNTOS Y NO ME ARREPIENTO IKAUJSKAJSKAJSKJKSJAKSJSkjsKJSK
         
         la logica es simple, el problema nos da dos conjuntos, 

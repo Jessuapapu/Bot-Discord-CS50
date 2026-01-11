@@ -1,10 +1,9 @@
 # main.py
 import discord
 from discord.ext import commands
-import sys, os
+import os
 
 from dotenv import load_dotenv
-import threading
 from Declaraciones.views import viewsPersistentes
 
 # singleton.py
@@ -12,10 +11,6 @@ from Declaraciones.EstadoGlobal import EstadoGlobal
 
 # Instancia única de EstadoGlobal que se comparte en todo el proyecto
 EG = EstadoGlobal()
-
-# importar el serverweb
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from WebserverApp import webserver
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN", "")
@@ -43,7 +38,4 @@ def run_bot():
     bot.run(TOKEN)
 
 if __name__ == "__main__":
-    # Iniciamos el bot en segundo plano
-    threading.Thread(target=run_bot, daemon=True).start()
-
-    webserver.socketio.run(app=webserver.app,host="0.0.0.0", port=10000)
+    run_bot()

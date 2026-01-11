@@ -1,7 +1,8 @@
 from Clases.Botones import BotonBase
 from Declaraciones import EstadoGlobal
 Estado = EstadoGlobal.EstadoGlobal()
-from discord import Interaction
+from Clases import util
+from discord import Interaction, Color
 
 class botonesAsistencia(BotonBase.botonBase):
     def __init__(self, label, style, IdOffices):
@@ -19,8 +20,11 @@ class botonesAsistencia(BotonBase.botonBase):
             self.Offices.ListaDeVotos[usuario] += 1
             self.Offices.ControlDeVotos[usuario] += 1
             Estado.OfficesLista[self.Offices.Id] = self.Offices
-
-            await interaction_button.response.send_message("✅ Tu voto ha sido registrado.", ephemeral=True)
-        else:
-            await interaction_button.response.send_message("⚠ No estás registrado en esta Office o ya marcaste en la votacion", ephemeral=True)
+            
+            embed = util.CrearMensajeEmbed("Registro de Asistencia","Tu Asistencia ha sido registrado :)",Color.green())
+            await interaction_button.response.send_message(embed=embed, ephemeral=True)
+            return
+        
+        embed = util.CrearMensajeEmbed("Registro de votos","⚠ No estás registrado en esta Office o ya marcaste en la votacion",Color.red())
+        await interaction_button.response.send_message(embed=embed, ephemeral=True)
             

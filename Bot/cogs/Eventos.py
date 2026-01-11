@@ -6,7 +6,7 @@ import time
 from Clases.Botones import BotonBase
 from Declaraciones import EstadoGlobal
 from Clases import util
-from main import webserver
+# from main import webserver
 Estado = EstadoGlobal.EstadoGlobal()
 
 
@@ -66,8 +66,9 @@ class Eventos(commands.Cog):
     async def on_voice_state_update(self, member, before, after):
         user_id = str(member.display_name[10:])
         AutorRoles = [rol.name for rol in member.roles]
+        
         print("CONECTADO A DISCORD") 
-        webserver.socketio.emit('connected',{'data':'conectado a servidor'})
+        # webserver.socketio.emit('connected',{'data':'conectado a servidor'})
         
         if any(rol in ["Staff", "Admin Staff"] for rol in AutorRoles):
             return
