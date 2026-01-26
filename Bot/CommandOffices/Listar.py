@@ -6,7 +6,6 @@ Estado = EstadoGlobal.EstadoGlobal()
 
 async def ListaOffices(interaction:discord.Interaction):
     ListaOffices = Estado.getOfficesTotalValues()
-    print(ListaOffices)
     headers = ["ID", "Creador", "Hora", "Estado"]
     contenido = []
     
@@ -40,7 +39,7 @@ async def ListaEstudiantes(interaction:discord.Interaction, ID: str):
         contenidoTabla.append([Estudiante.IdUsuario, Estudiante.grupo, Estudiante.TiempoTotal // 60, Office.ListaDeVotos[Estudiante.IdUsuario]]) 
         
     tabla = util.CrearTabla(headerTabla,contenidoTabla,None)
-    embed = util.CrearMensajeEmbed("Lista de Estudiantes", f"El Tiempo son minutos\n```\n{tabla}\n```", discord.Color.dark_gold())
+    embed = util.CrearMensajeEmbed("```             - Lista de Estudiantes -            ```", f"El Tiempo son minutos\n```\n{tabla}\n```", discord.Color.dark_gold())
 
     await interaction.response.send_message(embed=embed)
     

@@ -82,4 +82,15 @@ class EstadoGlobal:
             
         return None
     
+    def to_dict(self):
+        dicc = {}
+        for OfficesKey in self.OfficesActivas.keys():
+            dicc[OfficesKey] = self.OfficesActivas[OfficesKey].to_dict()
+
+        for OfficesKey in self.OfficesActivas.keys():
+            dicc[OfficesKey] = self.OfficesActivas[OfficesKey].to_dict()
+
+        return dicc
+
+    
 estado_global = EstadoGlobal()

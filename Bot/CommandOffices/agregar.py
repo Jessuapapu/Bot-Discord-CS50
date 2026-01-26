@@ -4,7 +4,7 @@ from Clases.Formularios import FomularioAgregarEstu
 
 Estado = EstadoGlobal.EstadoGlobal()
 
-async def agregarEstuOffices(interaction: discord.Interaction, IDOffices, Estudiante: discord.Member):
+async def agregarEstuOffices(interaction: discord.Interaction, IDOffices, Estudiante: discord.Member    ):
     
     RolesEstudiante = [rol.name for rol in Estudiante.roles]
     

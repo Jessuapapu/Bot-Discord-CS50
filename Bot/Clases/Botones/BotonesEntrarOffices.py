@@ -20,6 +20,7 @@ class botonesEntrarOffices(BotonBase.botonBase):
             Estado.OfficesLista[self.IdOffices].Usuarios.append(NuevoEstu)
             Estado.OfficesLista[self.IdOffices].ListaDeVotos[NuevoEstu.IdUsuario] = 0
             await NuevoEstu.iniciarContador()
-            await interaction.response.send_message("Has sido añadido a la oficina correctamente.")
+            
+            await interaction.response.send_message("``` Has sido añadido a la oficina correctamente.``` :clipboard: :writing_hand:")
         else:
-            await interaction.response.send_message("No puedes usar este botón ya expiro o ya estas en la offices", ephemeral=True)
+            await interaction.response.send_message(" ``` No puedes usar este botón ya expiro o ya estas en la offices ```:eyes:", ephemeral=True)
