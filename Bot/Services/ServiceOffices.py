@@ -14,36 +14,58 @@ class Services:
     def _inicializar(self, TOKEN_SERVER: str ,API_KEY: str):
         self.___TOKEN_SERVER = TOKEN_SERVER
         self.___API_KEY = API_KEY
-        self.CacheOffices = TTLCache(maxsize=20, ttl=3900)
+
+        self.CacheOffices = TTLCache(maxsize=20, ttl=7500)
         self.CacheVotos = TTLCache(maxsize=20, ttl=300)
+        self.CacheEstudiantes = TTLCache(maxsize=100, ttl=7500)
         self.log = logs.Logs()
 
         try:
-            if requests.get(f"{TOKEN_SERVER}/").status_code != 200:
+            codigo = requests.get(f"{TOKEN_SERVER}/").status_code
+            if codigo != 200:
+                self.log.add_log(f"ERROR OBTENIDO AL TRATAR DE CONECTARSE AL SERVER {codigo}", "ERROR")
                 pass
+
+            self.log.add_log(f"CONECTADO AL SERVER {codigo}", "INFO")    
+
         except requests.exceptions.ConnectionError as e:
-            self.log.add_log(F"ERROR {e.strerror}","ERROR")
-            self.log
+            self.log.add_log(F"ERROR {e.strerror} o ERROR AL CONECTARSE AL SERVIDOR","ERROR")
             print("ERROR AL CONECTARSE AL SERVIDOR")
 
-    def getCacheOffices(self):
-        if len(self.CacheOffices.keys()) == 0:
 
-            json = self.__getOffices() 
+    def getCacheOffices(self):
+
+        if len(self.CacheOffices.keys()) < 0:
+            jsonOffices = self.__getOffices() 
             
-            if json is None:
-                self.log.add_log(f"NO SE PUDO CARGAR LA INFORMACION OBTENIDA")
+            if jsonOffices is None:
+                self.log.add_log(f"NO SE PUDO CARGAR LA INFORMACION OBTENIDA","INFO")
                 return None
             
-            for key in json:
-                self.CacheOffices[key] = OfficeClass.Offices(key, json[key]["IdUsuario"],
-                                                                   self.___formatoestudiantes(json[key]["Usuarios"]),json[key]["bloque"]
-                                                                   ,json[key]["canal"], json[key]["staff"])
-        
-
+            for key in jsonOffices:
+                estudiantes = self.___formatoestudiantes(jsonOffices[key]["Usuarios"])
+                self.CacheOffices[key] = OfficeClass.Offices(key, jsonOffices[key]["IdUsuario"],
+                                                                   estudiantes, jsonOffices[key]["bloque"]
+                                                                   ,jsonOffices[key]["canal"], jsonOffices[key]["staff"])
+                self.CacheEstudiantes[key] = estudiantes
         
         return self.CacheOffices
     
+
+    def getCacheEstudiantes(self):
+
+        if len(self.CacheEstudiantes.keys()) < 0:
+            jsonEstudiantes = self.__getEstudiantes()
+
+            if jsonEstudiantes is None:
+                self.log.add_log(F"NO SE PUDO CARGAR LA INFORMACION","INFO")
+                return None
+            
+            for key in jsonEstudiantes:
+                self.CacheEstudiantes[key] = self.___formatoestudiantes(jsonEstudiantes["Usuarios"]) 
+
+        return self.CacheEstudiantes
+
 
     def ___formatoestudiantes(self, lista: list) -> list[EstudianteClass.Estudiante]:
         ListaEstudiantes = []
@@ -57,7 +79,6 @@ class Services:
                 self.log(f"ERROR AL OBTENER ESTUDIANTE, {str(e)}","ERROR")
         
         return ListaEstudiantes
-
 
 
     def __getOffices(self, id: str = "") -> object | None:
@@ -87,5 +108,3 @@ class Services:
             return None
 
         return response.json()
-
-

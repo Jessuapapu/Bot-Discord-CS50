@@ -13,8 +13,6 @@ class EstudianteSimplificado:
             IdDiscord (str): Id de discord 
             IdOffices (str): Id de offices 
             grupo (str): Grupo del Usuario
-            TiempoTotal (int): cumplimiento en segundos totales
-            cumplimientoReal (float | int): cumplimiento en tiempo de 1 hora
         """
         
         self.IdUsuario = Usuario
