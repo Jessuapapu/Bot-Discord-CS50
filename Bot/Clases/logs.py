@@ -4,10 +4,10 @@ import datetime
 class Logs:
     def __init__(self):
         try:
-            self.logs = open(os.path.join(os.getcwd(), "logs", "log.log"), "a", encoding="utf-8")
+            self.logs = open(os.path.join(os.getcwd(), "logs", f"log-{datetime.datetime.now().date()}.log"), "a", encoding="utf-8")
         except FileNotFoundError:
             os.makedirs(os.path.join(os.getcwd(), "logs"), exist_ok=True)
-            self.logs = open(os.path.join(os.getcwd(), "logs", "log.log"), "a", encoding="utf-8")
+            self.logs = open(os.path.join(os.getcwd(), "logs", f"log-{datetime.datetime.now().date()}.log"), "a", encoding="utf-8")
         
 
     def add_log(self, log: str, level: str = "INFO"):

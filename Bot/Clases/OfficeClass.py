@@ -37,7 +37,7 @@ class Offices:
         setStaff(Nombres: list[str]):
             Asigna la lista de nombres del staff a la office.
    """
-    def __init__(self, Id, IdUsuario, Usuarios: list[Estudiante], bloque, CanalVoz: VoiceChannel | None, Staff: list = []):
+    def __init__(self, Id, IdUsuario, Usuarios: list[Estudiante], bloque, CanalVoz: VoiceChannel | None | str, Staff: list = []):
         
         # Informacion de la offices
         self.Id = Id
@@ -143,7 +143,7 @@ class Offices:
             "IdUsuario": self.IdUsuario,
             "HoraCreacion": self.HoraCreacion,
             "bloque": self.bloque,
-            "canal": self.canal.name if self.canal else None,
+            "canal": self.canal.id if type(self.canal) and type(self.canal) == VoiceChannel else self.canal,
             "staff": self.NombresStaff,
             "Usuarios": [u.to_dict() for u in self.Usuarios], 
         }

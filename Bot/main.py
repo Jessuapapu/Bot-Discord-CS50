@@ -11,9 +11,11 @@ from Declaraciones.EstadoGlobal import EstadoGlobal
 
 from Services import ServiceOffices
 
+from Clases import logs
+
 # Instancia única de EstadoGlobal que se comparte en todo el proyecto
 EG = EstadoGlobal()
-
+log = logs.Logs()
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN", None)
@@ -43,20 +45,20 @@ class MyBot(commands.Bot):
 bot = MyBot()
 
 def run_bot():
-    bot.run(TOKEN)
+    bot.run(TOKEN, reconnect=True)
 
 def main():
     if not TOKEN or not TOKEN_SERVER or not API_KEY:
         print("Falta algun token de auntetificacion")
         return
     
-    if requests.get(f"{TOKEN_SERVER}/").status_code != 200:
-        print("Servicios de la pagina desconectados!!!!!!")
 
     SW = ServiceOffices.Services(TOKEN_SERVER,API_KEY)
 
     SW.getCacheOffices()
     run_bot()
+
+    
     
 
 if __name__ == "__main__":

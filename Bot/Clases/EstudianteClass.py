@@ -1,7 +1,30 @@
 from discord import Member
 import asyncio
+
+
+class EstudianteSimplificado:
+    def __init__(self, Usuario: str | None = "", UsuarioDiscord: str | None = "", IdOffices: str | None = "", grupo: str | None = ""):
+        """_summary_
+        Clase para guardar datos en la cache
+
+        Args:
+            Usuario (str): Nombre de usuario (Display name)
+            UsuarioDiscord (str): Nombre de Usuario de discord
+            IdDiscord (str): Id de discord 
+            IdOffices (str): Id de offices 
+            grupo (str): Grupo del Usuario
+            TiempoTotal (int): cumplimiento en segundos totales
+            cumplimientoReal (float | int): cumplimiento en tiempo de 1 hora
+        """
+        
+        self.IdUsuario = Usuario
+        self.UsuarioDiscord = UsuarioDiscord
+        self.grupo = grupo
+        self.IdOffice = IdOffices
+
+
 class Estudiante:
-    def __init__(self, Usuario: Member | None, IdOffices):
+    def __init__(self, Usuario: Member | None, IdOffices: str | None):
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su nombre
         self.IdUsuario = Usuario.display_name[10:]
         self.Usuario = Usuario
@@ -88,3 +111,4 @@ class Estudiante:
             "cumplimientoReal": self.cumplimientoReal,
             "avatar": self.Usuario.avatar.url
         }
+    
