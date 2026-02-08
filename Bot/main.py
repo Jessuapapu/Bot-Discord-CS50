@@ -7,14 +7,12 @@ from dotenv import load_dotenv
 from Declaraciones.views import viewsPersistentes
 import requests
 # singleton.py
-from Declaraciones.EstadoGlobal import EstadoGlobal
 
 from Services import ServiceOffices
 
 from Clases import logs
 
 # Instancia única de EstadoGlobal que se comparte en todo el proyecto
-EG = EstadoGlobal()
 log = logs.Logs()
 
 load_dotenv()

@@ -1,7 +1,7 @@
 # Singleton que lleva toda la logica
 from discord import Member
 from Clases import EstudianteClass, OfficeClass
-
+from cachetools import TTLCache 
 
 class EstadoGlobal:
     """ 
@@ -21,15 +21,15 @@ class EstadoGlobal:
         return cls._instancia
 
     def _inicializar(self):
-        self.OfficesLista: dict[str,OfficeClass.Offices] = {} # { str(Id): Offices }, Es la estructura la cual guarda las offices que estan activas
-        self.OfficesRevision: dict[str,OfficeClass.Offices] = {}   # { str(Id): Offices }, Es la estructura la cual guarda la offices que ya terminaron y esta en revision
-        self.CanalesDeVoz: dict[str,str] = {}      # { str(Canal): IdOffices }, Es la estructura que asocia una offices con un canal de voz
+        self.OfficesLista: dict[str,OfficeClass.Offices] = TTLCache(maxsize=20, ttl=7500) # { str(Id): Offices }, Es la estructura la cual guarda las offices que estan activas
+        self.OfficesRevision: dict[str,OfficeClass.Offices] = TTLCache(maxsize=20, ttl=7500)   # { str(Id): Offices }, Es la estructura la cual guarda la offices que ya terminaron y esta en revision
+        self.CanalesDeVoz: dict[str,str] = TTLCache(maxsize=20, ttl=7500)      # { str(Canal): IdOffices }, Es la estructura que asocia una offices con un canal de voz
         
         #[ Lista de roles que se excluyen o se aceptan en el servidor cs|web ]
         self.ListaDeRolesPermitidos: list[str] = ["Staff", "Admin", "Admin Staff", "Profesor", "staff", "Bot", "Bots"] 
         self.ListaDeRolesPermitidosAdmin: list[str] = ["Admin", "Admin Staff", "Profesor"]
         
-        self.OfficesLista["Prueba"] = OfficeClass.Offices("Prueba","Jessua",[],"10",None,["akelly","ecalix","amejia"])
+        self.OfficesLista["Prueba456"] = OfficeClass.Offices("Prueba","Jessua",[],"10",None,["akelly","ecalix","amejia"])
         
     def getKeyCanalesDeVoz(self) -> list:
         """ Retorna Todas la key de los canales de voz """

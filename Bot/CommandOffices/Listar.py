@@ -11,7 +11,7 @@ async def ListaOffices(interaction:discord.Interaction):
     
     for offices in ListaOffices:
         estado = ''
-        if offices.Estado == 1:
+        if offices.Estado == True:
             estado = "Activa"
         else:
             estado = "Revision"

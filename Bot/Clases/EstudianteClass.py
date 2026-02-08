@@ -21,8 +21,9 @@ class EstudianteSimplificado:
         self.IdOffice = IdOffices
 
 
+
 class Estudiante:
-    def __init__(self, Usuario: Member | None, IdOffices: str | None):
+    def __init__(self, Usuario: Member | str | None = "", IdOffices: str | None = "", UsuarioDiscord: str | None = "",  grupo: str | None = ""):
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su nombre
         self.IdUsuario = Usuario.display_name[10:]
         self.Usuario = Usuario
@@ -55,6 +56,8 @@ class Estudiante:
             self.cumplimientoReal = 0.0
         
         return
+    
+    # hay que adaptar estas funcionalidades
     
     async def DetenerContador(self):
         if self.Contador and not self.Contador.done():

@@ -55,7 +55,7 @@ class Offices:
         self.ControlDeVotos = {}
         
         # Se refiere al estado, 1: Activa, 0: Finalizada
-        self.Estado = 1
+        self.Estado = True
         
         self._Limpieza = None
         

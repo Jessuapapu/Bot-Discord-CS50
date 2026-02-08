@@ -1,23 +1,24 @@
 import requests
-from cachetools import TTLCache
+from Declaraciones import EstadoGlobal
 from Clases import logs, OfficeClass, EstudianteClass
-import discord
+
 class Services:
 
     _instancia = None
     def __new__(cls,TOKEN_SERVER: str ,API_KEY: str):
+
         if cls._instancia is None:
             cls._instancia = super().__new__(cls)
             cls._instancia._inicializar(TOKEN_SERVER, API_KEY)
+
         return cls._instancia
 
-    def _inicializar(self, TOKEN_SERVER: str ,API_KEY: str):
+
+    def _inicializar(self, TOKEN_SERVER: str, API_KEY: str):
         self.___TOKEN_SERVER = TOKEN_SERVER
         self.___API_KEY = API_KEY
 
-        self.CacheOffices = TTLCache(maxsize=20, ttl=7500)
-        self.CacheVotos = TTLCache(maxsize=20, ttl=300)
-        self.CacheEstudiantes = TTLCache(maxsize=100, ttl=7500)
+        self.EG = EstadoGlobal.EstadoGlobal()
         self.log = logs.Logs()
 
         try:
@@ -35,34 +36,45 @@ class Services:
 
     def getCacheOffices(self):
 
-        if len(self.CacheOffices.keys()) < 0:
-            jsonOffices = self.__getOffices() 
-            
-            if jsonOffices is None:
-                self.log.add_log(f"NO SE PUDO CARGAR LA INFORMACION OBTENIDA","INFO")
-                return None
-            
-            for key in jsonOffices:
-                estudiantes = self.___formatoestudiantes(jsonOffices[key]["Usuarios"])
-                self.CacheOffices[key] = OfficeClass.Offices(key, jsonOffices[key]["IdUsuario"],
-                                                                   estudiantes, jsonOffices[key]["bloque"]
-                                                                   ,jsonOffices[key]["canal"], jsonOffices[key]["staff"])
-                self.CacheEstudiantes[key] = estudiantes
+        jsonOffices = self.__getOffices() 
         
-        return self.CacheOffices
+        if jsonOffices is None:
+            self.log.add_log(f"NO SE PUDO CARGAR LA INFORMACION OBTENIDA","INFO")
+            return None
+        
+        for key in jsonOffices:
+            if key in self.EG.OfficesLista.keys() or self.EG.OfficesRevision.keys():
+                continue    
+            
+            estudiantes = self.___formatoestudiantes(jsonOffices[key]["Usuarios"])
+            offices = OfficeClass.Offices(key, jsonOffices[key]["IdUsuario"],
+                                                               estudiantes, jsonOffices[key]["bloque"]
+                                                               ,jsonOffices[key]["canal"], jsonOffices[key]["staff"])
+
+            if jsonOffices[key]["Estado"] is True:
+                offices.Estado = True
+                self.EG.OfficesLista[key] = offices
+            
+            elif jsonOffices[key]["Estado"] is False:
+                offices.Estado = False
+                self.EG.OfficesRevision[key] = offices
+            
+            else:
+                self.log.add_log(f"ERROR AL CARGAR LA INFORMACION DE LA OFFICES {key}, no se sabe el estado","ERROR")
+
+        print(self.EG.OfficesLista)
+        return
     
 
     def getCacheEstudiantes(self):
 
-        if len(self.CacheEstudiantes.keys()) < 0:
-            jsonEstudiantes = self.__getEstudiantes()
-
-            if jsonEstudiantes is None:
-                self.log.add_log(F"NO SE PUDO CARGAR LA INFORMACION","INFO")
-                return None
-            
-            for key in jsonEstudiantes:
-                self.CacheEstudiantes[key] = self.___formatoestudiantes(jsonEstudiantes["Usuarios"]) 
+        jsonEstudiantes = self.__getEstudiantes()
+        if jsonEstudiantes is None:
+            self.log.add_log(F"NO SE PUDO CARGAR LA INFORMACION","INFO")
+            return None
+        
+        for key in jsonEstudiantes:
+            self.CacheEstudiantes[key] = self.___formatoestudiantes(jsonEstudiantes["Usuarios"]) 
 
         return self.CacheEstudiantes
 
@@ -72,7 +84,7 @@ class Services:
         
         for estudiante in lista:
             try:
-                estu = EstudianteClass.EstudianteSimplificado(estudiante["IdUsuario"], estudiante["IdDiscord"], estudiante["IdOffice"],
+                estu = EstudianteClass.Estudiante(estudiante["IdUsuario"], estudiante["IdDiscord"], estudiante["IdOffice"],
                                                                estudiante["grupo"])
                 ListaEstudiantes.append(estu)
             except Exception as e:
