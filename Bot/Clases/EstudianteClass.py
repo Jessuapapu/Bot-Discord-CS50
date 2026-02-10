@@ -25,6 +25,7 @@ class EstudianteSimplificado:
 class Estudiante:
     def __init__(self, Usuario: Member | str | None = "", IdOffices: str | None = "", UsuarioDiscord: str | None = "",  grupo: str | None = ""):
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su nombre
+                
         self.IdUsuario = Usuario.display_name[10:]
         self.Usuario = Usuario
         self.IdDiscord = Usuario.id
