@@ -23,15 +23,16 @@ class EstudianteSimplificado:
 
 
 class Estudiante:
-    def __init__(self, Usuario: Member | str | None = "", IdOffices: str | None = "", UsuarioDiscord: str | None = "",  grupo: str | None = ""):
+    def __init__(self, Usuario: Member | str | None = "", IdOffices: str | None = "", UsuarioDiscord: str | None = "", DisplayName : str = ""):
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su nombre
-                
-        self.IdUsuario = Usuario.display_name[10:]
-        self.Usuario = Usuario
-        self.IdDiscord = Usuario.id
+
+        self.Usuario = Usuario if type(Usuario) == Member else None
+
+        self.IdUsuario = Usuario.display_name[10:] if Usuario else DisplayName[10:]
+        self.IdDiscord = Usuario.id if Usuario else UsuarioDiscord
         
         # Como los estudiantes estan formateados con primero grupo luego su nombre de ahi se obtiene su grupo
-        self.grupo = Usuario.display_name[:7]
+        self.grupo = Usuario.display_name[:7] if Usuario else DisplayName[:7]
         self.IdOffice = IdOffices
         self.TiempoTotal = 0
         self.cumplimientoReal = 0

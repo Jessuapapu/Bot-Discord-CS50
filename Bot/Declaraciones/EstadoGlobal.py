@@ -21,6 +21,8 @@ class EstadoGlobal:
         return cls._instancia
 
     def _inicializar(self):
+        
+
         self.OfficesLista: dict[str,OfficeClass.Offices] = TTLCache(maxsize=20, ttl=7500) # { str(Id): Offices }, Es la estructura la cual guarda las offices que estan activas
         self.OfficesRevision: dict[str,OfficeClass.Offices] = TTLCache(maxsize=20, ttl=7500)   # { str(Id): Offices }, Es la estructura la cual guarda la offices que ya terminaron y esta en revision
         self.CanalesDeVoz: dict[str,str] = TTLCache(maxsize=20, ttl=7500)      # { str(Canal): IdOffices }, Es la estructura que asocia una offices con un canal de voz
